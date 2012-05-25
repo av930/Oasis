@@ -14,10 +14,10 @@ public class Main_Act extends Activity {
         setContentView(R.layout.main);
         mPlanView 	= (PlanView)findViewById(R.id.planview);
         mAddButton	= (Button)findViewById(R.id.addbutton);
-        mAddButton.setOnClickListener(new View.OnClickListener() {			
-			public void onClick(View v) {
-				mPlanView.addDefaultPlan();
-			}
-		});        
+        mAddButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mPlanView.addDefaultPlan();
+            }
+        });
     }
 }
