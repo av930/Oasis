@@ -77,4 +77,12 @@ public class Plan {
 
         mEntries.add(i, entry);
     }
+    
+    public int size() {
+        return mEntries.size();
+    }
+
+    public Entry get(int i) {
+        return mEntries.get(i);
+    }
 }
