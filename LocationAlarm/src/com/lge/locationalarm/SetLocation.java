@@ -53,7 +53,7 @@ public class SetLocation extends MapActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.setlocation_layout);
         mMapView = (MapView)findViewById(R.id.mapview);
-        
+
         mMapView.setBuiltInZoomControls(true); //줌인,줌아웃 컨트롤을 표시한다.
         mapController = mMapView.getController(); //맵컨트롤러를 가져온다.
         mapController.setZoom(20); //초기 확대는 17정도로..
@@ -80,7 +80,7 @@ public class SetLocation extends MapActivity  {
                 control.zoomIn();
             }
         });
-        
+
         mButton02 	= (Button) findViewById(R.id.Button02);
         mButton02.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -114,7 +114,7 @@ public class SetLocation extends MapActivity  {
         //@Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.d(LOG_TAG, "onStatusChanged : " + provider + " & status = "
-            + status);
+                  + status);
         }
     }
 
@@ -126,7 +126,7 @@ public class SetLocation extends MapActivity  {
             listOfOverlays.clear(); //오버레이가 있을때 싹 지워준다.
             Log.d(LOG_TAG, "clear overlays : " + listOfOverlays.size());
         } else {
-        	Log.d(LOG_TAG, "empty overlays");
+            Log.d(LOG_TAG, "empty overlays");
         }
         //Location 객체를 가지고 GeoPoint 객체를 얻어내는 메소드
         GeoPoint geoPoint = getGeoPoint(location);
@@ -141,10 +141,10 @@ public class SetLocation extends MapActivity  {
         overlayHere.mPopulate();
         //현재위치를 GeoCoder 를 이용하여 대략주소와 위,경도를 Toast 를 통하여 보여준다.
         String geoString;
-        if(location == null)
-        	geoString = "nowhere";
-        else         	
-        	geoString = showNowHere(location.getLatitude(), location.getLongitude() , true);
+        if (location == null)
+            geoString = "nowhere";
+        else
+            geoString = showNowHere(location.getLatitude(), location.getLongitude() , true);
         //현재위치 마커 정의
         OverlayItem overlayItem = new OverlayItem(geoPoint, "here", geoString);
         overlayHere.addOverlay(overlayItem); //현재위치 오버레이 리스트에 현재위치 마커를 넣는다.
@@ -286,7 +286,7 @@ public class SetLocation extends MapActivity  {
                                             "branch", sb.toString());
                                     overlayBranch.addOverlay(overlayItem);
                                 }
-                
+
                 //마커 찍은것이 없으면 오류 메세지를 토스트로 보여준다.
                 if (overlayBranch.size() < 1) {
                     Toast.makeText(getApplicationContext(),
@@ -331,7 +331,7 @@ public class SetLocation extends MapActivity  {
                 //여기서는 설명하지 않았다. onCreate 에서 생성했다.
                 bundle.putBoolean("SUCCESS_KEY", true); //성공하면 번들에 성공메세지 셋팅
             } catch (Exception e) {
-//		...
+    //    	...
                 bundle.putBoolean("SUCCESS_KEY", false); //실패하면 false 이다.
                 // ignore
             } finally {
@@ -346,8 +346,8 @@ public class SetLocation extends MapActivity  {
             }
         }
     }
-*/
-    
+    */
+
     public class MapTouchDetectorOverlay extends Overlay implements
                 OnGestureListener {
         private GestureDetector gestureDetector;
@@ -370,7 +370,7 @@ public class SetLocation extends MapActivity  {
             setOnGestureListener(onGestureListener);
             init();
         }
-        
+
         //생성자들이 호출할 초기화 함수
         private void init() {
             mHandler = new Handler();
@@ -399,72 +399,72 @@ public class SetLocation extends MapActivity  {
             }
         };
         @Override
-    	public boolean onTouchEvent(MotionEvent event, MapView mapView) {
-        	if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
+        public boolean onTouchEvent(MotionEvent event, MapView mapView) {
+            if ( event.getAction() == MotionEvent.ACTION_DOWN ) {
 //        		Toast.makeText(getBaseContext(), "HI", Toast.LENGTH_LONG).show();
-        	}
+            }
 //    		Toast.makeText(getBaseContext(), "aa", Toast.LENGTH_LONG).show();
-        	if (gestureDetector.onTouchEvent(event)) {
-        		return true;
-        	}
-        	onLongPress(event);
-    		return false;
-    	}
-		//@Override
-		public boolean onDown(MotionEvent e) {
-			if (onGestureListener != null) {
-				return onGestureListener.onDown(e);
-			} else {
-				// start timer
-				touchStartTime = System.currentTimeMillis();
-				mHandler.postDelayed(looongPressDetector,
-				LOOOOONG_PRESS_MILLI_SEC);
-				//1.5초 있다가 길게누름을 체크해본다.
-			}
-			return false;
-		}
-		//@Override
-		public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
-				float velocityY) {
-			if (onGestureListener != null) {
-				return onGestureListener.onFling(e1, e2, velocityX, velocityY);
-			}
-			return false;
-		}
-		//@Override
-		public void onLongPress(MotionEvent e) {
-			// TODO Auto-generated method stub
-			if (onGestureListener != null) {
-				onGestureListener.onLongPress(e);
-			}
-			//화면을 누르고 있으면 onLongPress 가 호출되는데 호출될때마다 체크할 시간을 변수에 넣는다.
-			//이부분이 퍼포먼스 하락에 영향을 줄 것 같다.
-			globalEvent = e;
-			longPressTime = System.currentTimeMillis();
-			Toast.makeText(getBaseContext(), "long press", Toast.LENGTH_LONG).show();			
-		}
-		//@Override
-		public boolean onScroll(MotionEvent e1, MotionEvent e2,
-				float distanceX, float distanceY) {
-			// TODO Auto-generated method stub
-			return false;
-		}
-		//@Override
-		public void onShowPress(MotionEvent e) {
-			// TODO Auto-generated method stub
-			if (onGestureListener != null) {
-				onGestureListener.onShowPress(e);
-			}			
-		}
-		//@Override
-		public boolean onSingleTapUp(MotionEvent e) {
-			if (onGestureListener != null) {
-				onGestureListener.onSingleTapUp(e);
-			}
-			return false;
-		}
+            if (gestureDetector.onTouchEvent(event)) {
+                return true;
+            }
+            onLongPress(event);
+            return false;
+        }
+        //@Override
+        public boolean onDown(MotionEvent e) {
+            if (onGestureListener != null) {
+                return onGestureListener.onDown(e);
+            } else {
+                // start timer
+                touchStartTime = System.currentTimeMillis();
+                mHandler.postDelayed(looongPressDetector,
+                                     LOOOOONG_PRESS_MILLI_SEC);
+                //1.5초 있다가 길게누름을 체크해본다.
+            }
+            return false;
+        }
+        //@Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+                               float velocityY) {
+            if (onGestureListener != null) {
+                return onGestureListener.onFling(e1, e2, velocityX, velocityY);
+            }
+            return false;
+        }
+        //@Override
+        public void onLongPress(MotionEvent e) {
+            // TODO Auto-generated method stub
+            if (onGestureListener != null) {
+                onGestureListener.onLongPress(e);
+            }
+            //화면을 누르고 있으면 onLongPress 가 호출되는데 호출될때마다 체크할 시간을 변수에 넣는다.
+            //이부분이 퍼포먼스 하락에 영향을 줄 것 같다.
+            globalEvent = e;
+            longPressTime = System.currentTimeMillis();
+            Toast.makeText(getBaseContext(), "long press", Toast.LENGTH_LONG).show();
+        }
+        //@Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2,
+                                float distanceX, float distanceY) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+        //@Override
+        public void onShowPress(MotionEvent e) {
+            // TODO Auto-generated method stub
+            if (onGestureListener != null) {
+                onGestureListener.onShowPress(e);
+            }
+        }
+        //@Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (onGestureListener != null) {
+                onGestureListener.onSingleTapUp(e);
+            }
+            return false;
+        }
         public void setOnGestureListener(OnGestureListener onGestureListener) {
-        	this.onGestureListener = onGestureListener;
-        }		
+            this.onGestureListener = onGestureListener;
+        }
     }
 }

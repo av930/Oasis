@@ -22,6 +22,13 @@ public class Plan {
             bgcolor 	= b;
         }
 
+        public boolean isInTime(int time) {
+            if ( startTime < time && time < endTime) {
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public String toString() {
             return "startTime = " + startTime + ", endTime = "+endTime+", title ="+title;
@@ -77,7 +84,7 @@ public class Plan {
 
         mEntries.add(i, entry);
     }
-    
+
     public int size() {
         return mEntries.size();
     }

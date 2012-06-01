@@ -15,7 +15,7 @@ public class LocationAlarmInitReceiver extends BroadcastReceiver {
         Log.d(AppConfig.TAG, "LocationAlarmInitReceiver" + action);
 
         if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-           
+
         }
     }
 }

@@ -23,21 +23,21 @@ import android.view.WindowManager;
 public class AppConfig {
     //-------------------------------------------------------------------------
     // Member Variables
-	public 	static final String		TAG				= "kihoon.kim";
-	public 	static final boolean	LOGD			= true;
-	public 	static final boolean 	DEBUG 			= true;
+    public 	static final String		TAG				= "kihoon.kim";
+    public 	static final boolean	LOGD			= true;
+    public 	static final boolean 	DEBUG 			= true;
 
     public 	static int 				mLongAxis;
     public 	static int 				mShortAxis;
     public 	static int 				mWidth;
     public 	static int 				mHeight;
-    public 	static Point			mCenter 		= new Point();    
-     
+    public 	static Point			mCenter 		= new Point();
+
     public static void init(Context context) {
         Display d 	= ((WindowManager)context.getApplicationContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         int nWidth 	= d.getWidth();
         int nHeight = d.getHeight();
-         
+
         if (nHeight >  nWidth) {
             mLongAxis 	= nHeight;
             mShortAxis 	= nWidth;
@@ -45,10 +45,10 @@ public class AppConfig {
             mLongAxis 	= nWidth;
             mShortAxis 	= nHeight;
         }
-        	
+
         mCenter.x 	= nWidth / 2;
         mCenter.y 	= nHeight / 2;
         mWidth 		= nWidth;
-        mHeight 	= nHeight;    
+        mHeight 	= nHeight;
     }
 }

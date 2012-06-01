@@ -24,7 +24,7 @@ public class LocationAlarmProvider extends ContentProvider {
     private static final String 		DATABASE_NAME 		= "locationalarm.db";
     private LocationAlarmOpenHelper 	mOpenHelper;
     private static SQLiteDatabase 		mDB;
-    
+
     @Override
     public boolean onCreate() {
         mOpenHelper 	= new LocationAlarmOpenHelper(getContext());
@@ -76,27 +76,27 @@ public class LocationAlarmProvider extends ContentProvider {
     }
 
     class LocationAlarmOpenHelper extends SQLiteOpenHelper {
-        private static final int	 	VERSION 			= 1;    
-        private static final String	 	TABLE_LOCATIONALARMINFO	= "locationalarminfo";    
-        
+        private static final int	 	VERSION 			= 1;
+        private static final String	 	TABLE_LOCATIONALARMINFO	= "locationalarminfo";
+
         public LocationAlarmOpenHelper(Context context) {
             super(context, DATABASE_NAME, null, VERSION);
             Log.w(AppConfig.TAG, "LocationAlarmOpenHelper");
         }
 
-		@Override
+        @Override
         public void onCreate(SQLiteDatabase db) {
             Log.w(AppConfig.TAG, "onCreate DB Version = "+db.getVersion());
-			Cursor c1=db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='"+TABLE_LOCATIONALARMINFO+"'", null);
-			try {
-				if (c1.getCount()==0) {
-					db.execSQL("CREATE TABLE "+TABLE_LOCATIONALARMINFO+"(_id INTEGER PRIMARY KEY AUTOINCREMENT, locationname TEXT, enable int);");
-					db.execSQL("INSERT INTO " + TABLE_LOCATIONALARMINFO + " VALUES(null,'대륭 6차',0);");
-					db.execSQL("INSERT INTO " + TABLE_LOCATIONALARMINFO + " VALUES(null,'우리집',0);");
-				}
-			} finally {
-				c1.close();
-			}
+            Cursor c1=db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='"+TABLE_LOCATIONALARMINFO+"'", null);
+            try {
+                if (c1.getCount()==0) {
+                    db.execSQL("CREATE TABLE "+TABLE_LOCATIONALARMINFO+"(_id INTEGER PRIMARY KEY AUTOINCREMENT, locationname TEXT, enable int);");
+                    db.execSQL("INSERT INTO " + TABLE_LOCATIONALARMINFO + " VALUES(null,'대륭 6차',0);");
+                    db.execSQL("INSERT INTO " + TABLE_LOCATIONALARMINFO + " VALUES(null,'우리집',0);");
+                }
+            } finally {
+                c1.close();
+            }
         }
 
         @Override

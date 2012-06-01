@@ -29,20 +29,20 @@ public class Main extends ListActivity {
 //        mList = (ListView)findViewById(android.R.id.list);
         mAddButton = (Button) findViewById(R.id.add);
         Cursor c = getContentResolver().query(CONTENT_URI,  new String[] {"_id", "locationname"}, null, null, "locationname");
-		startManagingCursor(c);        
+        startManagingCursor(c);
         PackageConfigListItemAdapter adapter = new PackageConfigListItemAdapter(this, R.layout.alarmlist_item, c);
-        setListAdapter(adapter);   
+        setListAdapter(adapter);
         mAddButton.setOnClickListener(new View.OnClickListener() {
-        	public void onClick(View v){
-        		//Intent intent = new Intent(Main.this, LocationAlarmEdit.class);
-        		Intent intent = new Intent(Main.this, SetLocation.class);
-        		startActivity(intent);
-        		
-        	}
+            public void onClick(View v) {
+                //Intent intent = new Intent(Main.this, LocationAlarmEdit.class);
+                Intent intent = new Intent(Main.this, SetLocation.class);
+                startActivity(intent);
+
+            }
         });
-        
+
     }
-	private final class PackageConfigListItemAdapter extends ResourceCursorAdapter {
+    private final class PackageConfigListItemAdapter extends ResourceCursorAdapter {
         public PackageConfigListItemAdapter(Context context, int layout, Cursor c) {
             super(context, layout, c);
         }
@@ -51,7 +51,7 @@ public class Main extends ListActivity {
         public void bindView(View view, Context context, Cursor cursor) {
             final PackageConfigListItemCache cache = (PackageConfigListItemCache) view.getTag();
             // Set the name
-            cache.locationAlarmText.setText(cache.locationAlarmString);            
+            cache.locationAlarmText.setText(cache.locationAlarmString);
         }
 
         @Override
@@ -60,19 +60,19 @@ public class Main extends ListActivity {
             PackageConfigListItemCache cache = new PackageConfigListItemCache();
             cache.locationAlarmString= cursor.getString(SUMMARY_LOCATIONALARM_COLUMN_INDEX);
             cache.locationAlarmText = (TextView) view.findViewById(R.id.location);
-/*            view.setOnClickListener(new OnClickListener(){ 
-            	public void onClick(View v){
-            		final PackageConfigListItemCache cache = (PackageConfigListItemCache) v.getTag();
-            	}
-            });
-*/            
+            /*            view.setOnClickListener(new OnClickListener(){
+                        	public void onClick(View v){
+                        		final PackageConfigListItemCache cache = (PackageConfigListItemCache) v.getTag();
+                        	}
+                        });
+            */
             view.setTag(cache);
             return view;
-        } 
+        }
     }
 
     final static class PackageConfigListItemCache {
         public TextView locationAlarmText;
         public String 	locationAlarmString;
-    }	    
+    }
 }
