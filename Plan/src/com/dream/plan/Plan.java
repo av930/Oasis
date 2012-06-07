@@ -53,13 +53,13 @@ public class Plan {
 
     public void init() {
         mArrBlockColor 		= new int[OBJECT_NUMBER];
-        mArrBlockColor[0] 	= Color.BLUE;
-        mArrBlockColor[1] 	= Color.GREEN;
-        mArrBlockColor[2] 	= Color.RED;
-        mArrBlockColor[3] 	= Color.GRAY;
-        mArrBlockColor[4] 	= Color.rgb(255, 255, 0);
-        mArrBlockColor[5] 	= Color.rgb(255, 0, 255);
-        mArrBlockColor[6] 	= Color.rgb(0, 255, 255);
+        mArrBlockColor[0] 	= Color.rgb(255, 230, 230);
+        mArrBlockColor[1] 	= Color.rgb(230, 255, 230);
+        mArrBlockColor[2] 	= Color.rgb(230, 230, 255);
+        mArrBlockColor[3] 	= Color.rgb(255, 255, 230);
+        mArrBlockColor[4] 	= Color.rgb(255, 230, 255);
+        mArrBlockColor[5] 	= Color.rgb(230, 255, 255);
+        mArrBlockColor[6] 	= Color.rgb(230, 230, 230);
     }
 
     public int getLastTime() {
