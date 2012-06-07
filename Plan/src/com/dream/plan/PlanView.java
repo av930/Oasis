@@ -16,6 +16,29 @@ import android.widget.Toast;
 
 public class PlanView extends View implements OnGestureListener {
 
+    class ExRectF extends RectF {
+        public ExRectF(float left, float top, float right, float bottom) {
+            super(left, top, right, bottom);
+        }
+        public void magnify(float mag) {
+            left    *= mag;
+            top     *= mag;
+            right   *= mag;
+            bottom  *= mag;
+        }
+    }
+
+    class ExPoint extends Point {
+        public ExPoint(int x, int y) {
+            super(x, y);
+        }
+
+        public void magnify(float mag) {
+            x    *= mag;
+            y    *= mag;
+        }
+    }
+
     private static final int 		ACTIVE_NONE 			= -1;
 
     private static final int		STATUS_NO_ACTIVE 		= 0;
@@ -23,20 +46,25 @@ public class PlanView extends View implements OnGestureListener {
     private static final int		STATUS_ACTIVE_START		= 2;
     private static final int		STATUS_ACTIVE_END		= 3;
 
-    private static final int		POINT_SIZE = 8;
-    private static final int		TOUCH_AREA = 20;
+    private static final int		POINT_SIZE = -8;
+    private static final int		TOUCH_AREA = -30;
     private static final int		LINE_WIDTH = 2;
-    private final GestureDetector 	m_GestureDetector;
+
+    private final GestureDetector 	mGestureDetector;
     private int						mStatus;
     private int 					mActiveArcIndex;
     private int 					mRadius;
     private Plan 					mPlan;
-    private Point 					mMargin;
-    private RectF 					mCircleRect;
-    private Point 					mCenter;
-    private Point 					mScroll;
+    private ExPoint 				mMargin;
+    private ExRectF					mCircleRect;
+    private ExPoint 				mCenter;
+    private ExPoint 				mScroll;
     private Context					mContext;
-
+    private float					mScale;
+    private float					mOldScale;
+    private float 					mCurDist;
+    private float 					mOldDist;
+    private boolean 				mMultiTouch;
 
     public PlanView(Context context) {
         this(context,null,0);
@@ -53,15 +81,30 @@ public class PlanView extends View implements OnGestureListener {
         mStatus 			= STATUS_NO_ACTIVE;
         mRadius 			= 300;
         mPlan 				= new Plan();
-        mMargin 			= new Point(30,30);
-        mScroll				= new Point(0,0);
-        m_GestureDetector 	= new GestureDetector(this);
+        mMargin 			= new ExPoint(30,30);
+        mScroll				= new ExPoint(0,0);
+        mGestureDetector 	= new GestureDetector(this);
+        mScale				= 1;
+        mOldScale			= mScale;
+        mMargin.magnify(mScale);
+
+        mOldDist 			= 0;
+        mCurDist			= 0;
+        mMultiTouch 		= false;
         calcCoordinate();
     }
 
     public void calcCoordinate() {
-        mCircleRect 		= new RectF(mScroll.x + mMargin.x, mScroll.y + mMargin.y, mScroll.x + 2 * mRadius + mMargin.x, mScroll.y + 2 * mRadius + mMargin.y);
-        mCenter 			= new Point(mScroll.x + mMargin.x + mRadius, mScroll.y + mMargin.y + mRadius);
+        mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );
+        mCenter 			= new ExPoint(mRadius, mRadius);
+
+        mCircleRect.offset(mMargin.x, mMargin.y);
+        mCircleRect.magnify(mScale);
+        mCircleRect.offset(mScroll.x , mScroll.y);
+
+        mCenter.offset(mMargin.x, mMargin.y);
+        mCenter.magnify(mScale);
+        mCenter.offset(mScroll.x , mScroll.y);
     }
 
     @Override
@@ -94,32 +137,71 @@ public class PlanView extends View implements OnGestureListener {
             }
 
             canvas.drawArc(mCircleRect, convertTime2Angle(entry.startTime), (float) convertTime2Angle(entry.endTime) - convertTime2Angle(entry.startTime), true, curArcLinePaint);
-            RectF rect1 = new RectF(mCenter.x-POINT_SIZE, mCenter.y-POINT_SIZE, mCenter.x+POINT_SIZE, mCenter.y+POINT_SIZE);
+            RectF rect1 = new RectF(mCenter.x, mCenter.y, mCenter.x, mCenter.y);
+            rect1.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
             canvas.drawRect(rect1, curArcPointPaint);
 
             Point point = getPoint(entry.startTime);
-            RectF rect2 = new RectF(mScroll.x + point.x-POINT_SIZE, mScroll.y + point.y-POINT_SIZE, mScroll.x + point.x+POINT_SIZE, mScroll.y + point.y+POINT_SIZE);
+            RectF rect2 = new RectF(mScale*point.x, mScale*point.y, mScale*point.x, mScale*point.y);
+            rect2.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
+            rect2.offset(mScale*(mMargin.x) + mScroll.x, mScale*(mMargin.y) + mScroll.y);
 
             canvas.drawRect(rect2, curArcPointPaint);
 
             point = getPoint(entry.endTime);
-            RectF rect3 = new RectF(mScroll.x + point.x-POINT_SIZE, mScroll.y + point.y-POINT_SIZE, mScroll.x + point.x+POINT_SIZE, mScroll.y + point.y+POINT_SIZE);
+            RectF rect3 = new RectF(mScale*point.x, mScale*point.y, mScale*point.x, mScale*point.y);
+            rect3.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
+            rect3.offset(mScale*(mMargin.x) + mScroll.x, mScale*(mMargin.y) + mScroll.y);
             canvas.drawRect(rect3, curArcPointPaint);
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (m_GestureDetector.onTouchEvent(event))
+        if (mGestureDetector.onTouchEvent(event))
             return true;
         int action = event.getAction();
-        Log.i("kihoon.kim"," onTouchEvent() event = " + event);
-        if (action == MotionEvent.ACTION_DOWN) {
+        float xCur = event.getX();
+        float yCur = event.getY();
+
+        int p_count = event.getPointerCount();
+
+        //Log.i("kihoon.kim"," onTouchEvent() event = " + event);
+        switch (action) {
+        case MotionEvent.ACTION_DOWN:
             TouchDownEvent(event);
-        } else if (action == MotionEvent.ACTION_UP) {
+            break;
+        case MotionEvent.ACTION_UP:
             TouchUpEvent(event);
-        } else if (action == MotionEvent.ACTION_MOVE) {
-            TouchMoveEvent(event);
+            break;
+        case MotionEvent.ACTION_MOVE:
+            if (p_count > 1) {
+                // point 2 coords
+                float xSec = event.getX(1);
+                float ySec = event.getY(1);
+
+                // distance between
+                mCurDist = (float) Math.sqrt(Math.pow(xSec - xCur, 2) + Math.pow(ySec - yCur, 2));
+                mScale = mOldScale + mCurDist / mOldDist - 1;
+                Log.i("kihoon.kim", "onTouchEvent() scale="+mScale);
+
+                calcCoordinate();
+                invalidate();
+            } else {
+                TouchMoveEvent(event);
+            }
+            break;
+        case MotionEvent.ACTION_POINTER_DOWN | 0x100:
+            float xSec = event.getX(1);
+            float ySec = event.getY(1);
+
+            float mCurDist = (float) Math.sqrt(Math.pow(xSec - xCur, 2) + Math.pow(ySec - yCur, 2));
+            mOldDist 	= mCurDist;
+            mOldScale 	= mScale;
+            mMultiTouch = true;
+            break;
+        case MotionEvent.ACTION_POINTER_UP | 0x100:
+            break;
         }
 
         return super.onTouchEvent(event);
@@ -141,8 +223,8 @@ public class PlanView extends View implements OnGestureListener {
     private Point getPoint(int time) {
         Point point = new Point();
         int angle = convertTime2Angle(time);
-        int x = (int) (Math.cos(angle * Math.PI/2/90)*mRadius) + mRadius + mMargin.x;
-        int y = (int) (Math.sin(angle * Math.PI/2/90)*mRadius) + mRadius + mMargin.y;
+        int x = (int) (Math.cos(angle * Math.PI/2/90)*mRadius) + mRadius;
+        int y = (int) (Math.sin(angle * Math.PI/2/90)*mRadius) + mRadius;
         point.x = x;
         point.y = y;
         return point;
@@ -154,10 +236,21 @@ public class PlanView extends View implements OnGestureListener {
 
         if ( mActiveArcIndex != ACTIVE_NONE) {
             Entry entry = mPlan.get(mActiveArcIndex);
+
             Point startPoint = getPoint(entry.startTime);
-            RectF startRect = new RectF(mScroll.x + startPoint.x-TOUCH_AREA, mScroll.y + startPoint.y-TOUCH_AREA, mScroll.x + startPoint.x+TOUCH_AREA, mScroll.y + startPoint.y+TOUCH_AREA);
+            ExRectF startRect = new ExRectF(startPoint.x, startPoint.y, startPoint.x, startPoint.y);
+            startRect.offset(mMargin.x, mMargin.y);
+            startRect.magnify(mScale);
+            startRect.offset(mScroll.x, mScroll.y);
+            startRect.inset(TOUCH_AREA, TOUCH_AREA);
+
             Point endPoint = getPoint(entry.endTime);
-            RectF endRect = new RectF(mScroll.x + endPoint.x-TOUCH_AREA, mScroll.y + endPoint.y-TOUCH_AREA, mScroll.x + endPoint.x+TOUCH_AREA, mScroll.y + endPoint.y+TOUCH_AREA);
+            ExRectF endRect = new ExRectF(endPoint.x, endPoint.y, endPoint.x, endPoint.y);
+            endRect.offset(mMargin.x, mMargin.y);
+            endRect.magnify(mScale);
+            endRect.offset(mScroll.x, mScroll.y);
+            endRect.inset(TOUCH_AREA, TOUCH_AREA);
+
             if (startRect.contains(x, y)) {
                 Log.i("kihoon.kim"," startRect touch down");
                 mStatus = STATUS_ACTIVE_START;
@@ -171,21 +264,24 @@ public class PlanView extends View implements OnGestureListener {
             }
         }
     }
+    
     private void TouchMoveEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        float x1 = x-mMargin.x-mRadius- mScroll.x;
-        float y1 = y-mMargin.y-mRadius- mScroll.y;
+        float x1 = x - (mRadius + mMargin.x ) * mScale - mScroll.x;
+        float y1 = y - (mRadius + mMargin.y ) * mScale - mScroll.y;
         if ( mStatus == STATUS_ACTIVE_START ) {
-
+            double angle = getAngle(x1, y1);
+            Entry entry = mPlan.get(mActiveArcIndex);
+            entry.startTime = (int) (angle * 4);
+            Log.i("kihoon.kim"," Move angle = "+angle);
+            invalidate();
         } else if (mStatus == STATUS_ACTIVE_END) {
             double angle = getAngle(x1, y1);
             Entry entry = mPlan.get(mActiveArcIndex);
             entry.endTime = (int) (angle * 4);
             Log.i("kihoon.kim"," Move angle = "+angle);
             invalidate();
-        } else if (mStatus == STATUS_ACTIVE_INDEX) {
-
         }
     }
 
@@ -193,6 +289,10 @@ public class PlanView extends View implements OnGestureListener {
         if (	mStatus == STATUS_ACTIVE_START ||
                 mStatus == STATUS_ACTIVE_END ) {
             mStatus = STATUS_ACTIVE_INDEX;
+        } else {
+            if ( mMultiTouch ) {
+                mMultiTouch = false;                
+            }
         }
     }
 
@@ -202,7 +302,7 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.i("kihoon.kim","onFling()");
+        Log.i("kihoon.kim","onFling()"+velocityX);
         return false;
     }
 
@@ -215,6 +315,8 @@ public class PlanView extends View implements OnGestureListener {
                 mStatus == STATUS_ACTIVE_END ) {
             return false;
         }
+        if (mMultiTouch)
+            return false;
         mScroll.x -= distanceX;
         mScroll.y -= distanceY;
         calcCoordinate();
@@ -230,9 +332,9 @@ public class PlanView extends View implements OnGestureListener {
         Log.i("kihoon.kim","onSingleTapUp()");
         float x = e.getX();
         float y = e.getY();
-        float x1 = x-mMargin.x-mRadius-mScroll.x;
-        float y1 = y-mMargin.y-mRadius-mScroll.y;
-        if ( Math.pow((x1), 2) + Math.pow((y1), 2) <  Math.pow(mRadius, 2) ) {
+        float x1 = x - (mRadius + mMargin.x ) * mScale - mScroll.x;
+        float y1 = y - (mRadius + mMargin.y ) * mScale - mScroll.y;
+        if ( Math.pow((x1), 2) + Math.pow((y1), 2) <  Math.pow(mRadius * mScale, 2) ) {
             double angle = getAngle(x1, y1);
             Log.i("kihoon.kim","angle="+angle);
             int size = mPlan.size();
@@ -251,7 +353,6 @@ public class PlanView extends View implements OnGestureListener {
         } else {
             Toast.makeText(mContext, "out of Circle", Toast.LENGTH_LONG).show();
         }
-
         return false;
     }
 }
