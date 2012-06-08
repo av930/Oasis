@@ -34,8 +34,8 @@ public class Plan {
             return "startTime = " + startTime + ", endTime = "+endTime+", title ="+title;
         }
     }
-    private final int OBJECT_NUMBER			= 7;
-    private int[] 			mArrBlockColor;
+    private final int 	OBJECT_NUMBER			= 7;
+    private int[] 		mArrBlockColor;
 
     public Random mRnd 			= new Random();
     private final ArrayList<Entry> mEntries = new ArrayList<Entry>();

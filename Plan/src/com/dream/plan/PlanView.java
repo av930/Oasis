@@ -1,6 +1,7 @@
 package com.dream.plan;
 
 import com.dream.plan.Plan.Entry;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -13,6 +14,7 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+import com.lge.config.AppConfig;
 
 public class PlanView extends View implements OnGestureListener {
 
@@ -65,6 +67,7 @@ public class PlanView extends View implements OnGestureListener {
     private float 					mCurDist;
     private float 					mOldDist;
     private boolean 				mMultiTouch;
+    private Paint 					mTotalCirclePaint;
 
     public PlanView(Context context) {
         this(context,null,0);
@@ -91,28 +94,17 @@ public class PlanView extends View implements OnGestureListener {
         mOldDist 			= 0;
         mCurDist			= 0;
         mMultiTouch 		= false;
+
+        mTotalCirclePaint = new Paint();
+        mTotalCirclePaint.setARGB(255, 255, 225, 225);
+
         calcCoordinate();
-    }
-
-    public void calcCoordinate() {
-        mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );
-        mCenter 			= new ExPoint(mRadius, mRadius);
-
-        mCircleRect.offset(mMargin.x, mMargin.y);
-        mCircleRect.magnify(mScale);
-        mCircleRect.offset(mScroll.x , mScroll.y);
-
-        mCenter.offset(mMargin.x, mMargin.y);
-        mCenter.magnify(mScale);
-        mCenter.offset(mScroll.x , mScroll.y);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Paint totalCirclePaint = new Paint();
-        totalCirclePaint.setARGB(255, 255, 225, 225);
-        canvas.drawArc(mCircleRect, 0, (float) (360), true, totalCirclePaint);
+        canvas.drawArc(mCircleRect, 0, (float) (360), true, mTotalCirclePaint);
         int size = mPlan.size();
         for (int i=0;i<size;i++) {
             Entry entry = mPlan.get(i);
@@ -161,12 +153,10 @@ public class PlanView extends View implements OnGestureListener {
         if (mGestureDetector.onTouchEvent(event))
             return true;
         int action = event.getAction();
-        float xCur = event.getX();
-        float yCur = event.getY();
+        float originX1 = event.getX();
+        float originY1 = event.getY();
 
-        int p_count = event.getPointerCount();
-
-        //Log.i("kihoon.kim"," onTouchEvent() event = " + event);
+        //if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," onTouchEvent() event = " + event);
         switch (action) {
         case MotionEvent.ACTION_DOWN:
             TouchDownEvent(event);
@@ -175,41 +165,113 @@ public class PlanView extends View implements OnGestureListener {
             TouchUpEvent(event);
             break;
         case MotionEvent.ACTION_MOVE:
-            if (p_count > 1) {
-                // point 2 coords
-                float xSec = event.getX(1);
-                float ySec = event.getY(1);
-
-                // distance between
-                mCurDist = (float) Math.sqrt(Math.pow(xSec - xCur, 2) + Math.pow(ySec - yCur, 2));
-                mScale = mOldScale + mCurDist / mOldDist - 1;
-                Log.i("kihoon.kim", "onTouchEvent() scale="+mScale);
-
-                calcCoordinate();
-                invalidate();
-            } else {
-                TouchMoveEvent(event);
-            }
-            break;
         case MotionEvent.ACTION_POINTER_DOWN | 0x100:
-            float xSec = event.getX(1);
-            float ySec = event.getY(1);
+            int pointCount = event.getPointerCount();
+            if (pointCount > 1) {
+                float originX2 = event.getX(1);
+                float originY2 = event.getY(1);
+                // distance between
+                mCurDist = (float) Math.sqrt(Math.pow(originX2 - originX1, 2) + Math.pow(originY2 - originY1, 2));
+                if (action == MotionEvent.ACTION_MOVE) {
+                    mScale = mOldScale + mCurDist / mOldDist - 1;
+                    if ( AppConfig.LOGD ) Log.d(AppConfig.TAG, "onTouchEvent() scale="+mScale);
 
-            float mCurDist = (float) Math.sqrt(Math.pow(xSec - xCur, 2) + Math.pow(ySec - yCur, 2));
-            mOldDist 	= mCurDist;
-            mOldScale 	= mScale;
-            mMultiTouch = true;
+                    calcCoordinate();
+                    invalidate();
+                } else if (action == (MotionEvent.ACTION_POINTER_DOWN | 0x100)) {
+                    mOldDist 	= mCurDist;
+                    mOldScale 	= mScale;
+                    mMultiTouch = true;
+                }
+            } else {
+                if (action == MotionEvent.ACTION_MOVE) {
+                    TouchMoveEvent(event);
+                }
+            }
             break;
         case MotionEvent.ACTION_POINTER_UP | 0x100:
             break;
         }
-
         return super.onTouchEvent(event);
+    }
+
+    public boolean onDown(MotionEvent arg0) {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onDown()");
+        return false;
+    }
+
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onFling()"+velocityX);
+        return false;
+    }
+
+    public void onLongPress(MotionEvent e) {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onLongPress()");
+    }
+
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        if (	mStatus == STATUS_ACTIVE_START ||
+                mStatus == STATUS_ACTIVE_END ) {
+            return false;
+        }
+        if (mMultiTouch)
+            return false;
+        mScroll.x -= distanceX;
+        mScroll.y -= distanceY;
+        calcCoordinate();
+        invalidate();
+        return false;
+    }
+
+    public void onShowPress(MotionEvent e) {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onShowPress()");
+    }
+
+    public boolean onSingleTapUp(MotionEvent e) {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onSingleTapUp()");
+
+        float originX = e.getX();
+        float originY = e.getY();
+        float x = originX - (mRadius + mMargin.x ) * mScale - mScroll.x;
+        float y = originY - (mRadius + mMargin.y ) * mScale - mScroll.y;
+        if ( Math.pow((x), 2) + Math.pow((y), 2) <  Math.pow(mRadius * mScale, 2) ) {
+            double angle = getAngle(x, y);
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"angle="+angle);
+            int size = mPlan.size();
+            mActiveArcIndex = ACTIVE_NONE;
+            mStatus = STATUS_NO_ACTIVE;
+            for (int i=0;i<size;i++) {
+                Entry entry = mPlan.get(i);
+                int time = (int)(angle * 4);
+                if ( entry.isInTime(time) ) {
+                    if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," i = "+i);
+                    mActiveArcIndex = i;
+                    mStatus = STATUS_ACTIVE_INDEX;
+                }
+            }
+            invalidate();
+        } else {
+            Toast.makeText(mContext, "out of Circle", Toast.LENGTH_LONG).show();
+        }
+        return false;
     }
 
     public void addDefaultPlan() {
         mPlan.addDefaultPlan();
         invalidate();
+    }
+
+    private void calcCoordinate() {
+        mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );
+        mCenter 			= new ExPoint(mRadius, mRadius);
+
+        mCircleRect.offset(mMargin.x, mMargin.y);
+        mCircleRect.magnify(mScale);
+        mCircleRect.offset(mScroll.x , mScroll.y);
+
+        mCenter.offset(mMargin.x, mMargin.y);
+        mCenter.magnify(mScale);
+        mCenter.offset(mScroll.x , mScroll.y);
     }
 
     private int convertTime2Angle(int time) {
@@ -231,8 +293,8 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     private void TouchDownEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        float originX = event.getX();
+        float originY = event.getY();
 
         if ( mActiveArcIndex != ACTIVE_NONE) {
             Entry entry = mPlan.get(mActiveArcIndex);
@@ -251,36 +313,36 @@ public class PlanView extends View implements OnGestureListener {
             endRect.offset(mScroll.x, mScroll.y);
             endRect.inset(TOUCH_AREA, TOUCH_AREA);
 
-            if (startRect.contains(x, y)) {
-                Log.i("kihoon.kim"," startRect touch down");
+            if (startRect.contains(originX, originY)) {
+                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," startRect touch down");
                 mStatus = STATUS_ACTIVE_START;
                 invalidate();
                 return ;
-            } else if (endRect.contains(x, y)) {
-                Log.i("kihoon.kim"," endRect touch down");
+            } else if (endRect.contains(originX, originY)) {
+                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," endRect touch down");
                 mStatus = STATUS_ACTIVE_END;
                 invalidate();
                 return ;
             }
         }
     }
-    
+
     private void TouchMoveEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        float x1 = x - (mRadius + mMargin.x ) * mScale - mScroll.x;
-        float y1 = y - (mRadius + mMargin.y ) * mScale - mScroll.y;
+        float originX = event.getX();
+        float originY = event.getY();
+        float x = originX - (mRadius + mMargin.x ) * mScale - mScroll.x;
+        float y = originY - (mRadius + mMargin.y ) * mScale - mScroll.y;
         if ( mStatus == STATUS_ACTIVE_START ) {
-            double angle = getAngle(x1, y1);
+            double angle = getAngle(x, y);
             Entry entry = mPlan.get(mActiveArcIndex);
             entry.startTime = (int) (angle * 4);
-            Log.i("kihoon.kim"," Move angle = "+angle);
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
         } else if (mStatus == STATUS_ACTIVE_END) {
-            double angle = getAngle(x1, y1);
+            double angle = getAngle(x, y);
             Entry entry = mPlan.get(mActiveArcIndex);
             entry.endTime = (int) (angle * 4);
-            Log.i("kihoon.kim"," Move angle = "+angle);
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
         }
     }
@@ -291,68 +353,8 @@ public class PlanView extends View implements OnGestureListener {
             mStatus = STATUS_ACTIVE_INDEX;
         } else {
             if ( mMultiTouch ) {
-                mMultiTouch = false;                
+                mMultiTouch = false;
             }
         }
-    }
-
-    public boolean onDown(MotionEvent arg0) {
-        Log.i("kihoon.kim","onDown()");
-        return false;
-    }
-
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.i("kihoon.kim","onFling()"+velocityX);
-        return false;
-    }
-
-    public void onLongPress(MotionEvent e) {
-        Log.i("kihoon.kim","onLongPress()");
-    }
-
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (	mStatus == STATUS_ACTIVE_START ||
-                mStatus == STATUS_ACTIVE_END ) {
-            return false;
-        }
-        if (mMultiTouch)
-            return false;
-        mScroll.x -= distanceX;
-        mScroll.y -= distanceY;
-        calcCoordinate();
-        invalidate();
-        return false;
-    }
-
-    public void onShowPress(MotionEvent e) {
-        Log.i("kihoon.kim","onShowPress()");
-    }
-
-    public boolean onSingleTapUp(MotionEvent e) {
-        Log.i("kihoon.kim","onSingleTapUp()");
-        float x = e.getX();
-        float y = e.getY();
-        float x1 = x - (mRadius + mMargin.x ) * mScale - mScroll.x;
-        float y1 = y - (mRadius + mMargin.y ) * mScale - mScroll.y;
-        if ( Math.pow((x1), 2) + Math.pow((y1), 2) <  Math.pow(mRadius * mScale, 2) ) {
-            double angle = getAngle(x1, y1);
-            Log.i("kihoon.kim","angle="+angle);
-            int size = mPlan.size();
-            mActiveArcIndex = ACTIVE_NONE;
-            mStatus = STATUS_NO_ACTIVE;
-            for (int i=0;i<size;i++) {
-                Entry entry = mPlan.get(i);
-                int time = (int)(angle * 4);
-                if ( entry.isInTime(time) ) {
-                    Log.i("kihoon.kim"," i = "+i);
-                    mActiveArcIndex = i;
-                    mStatus = STATUS_ACTIVE_INDEX;
-                }
-            }
-            invalidate();
-        } else {
-            Toast.makeText(mContext, "out of Circle", Toast.LENGTH_LONG).show();
-        }
-        return false;
     }
 }
