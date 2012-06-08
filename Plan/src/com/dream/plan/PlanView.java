@@ -15,17 +15,20 @@ package com.dream.plan;
 import com.dream.plan.Plan.Entry;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 import com.lge.config.AppConfig;
 
 public class PlanView extends View implements OnGestureListener {
@@ -84,6 +87,7 @@ public class PlanView extends View implements OnGestureListener {
     private Paint 					mInactiveArcLinePaint;
     private Paint 					mActiveArcPointPaint;
     private Paint 					mInactiveArcPointPaint;
+    private Shader mBG;     // background checker-board pattern
 
     public PlanView(Context context) {
         this(context,null,0);
@@ -98,10 +102,10 @@ public class PlanView extends View implements OnGestureListener {
         mContext 			= context;
         mActiveArcIndex 	= ACTIVE_NONE;
         mStatus 			= STATUS_NO_ACTIVE;
-        mRadius 			= 300;
         mPlan 				= new Plan();
         mMargin 			= new ExPoint(30,30);
         mScroll				= new ExPoint(0,0);
+        mRadius 			= (AppConfig.mShortAxis)/2 - mMargin.x;
         mGestureDetector 	= new GestureDetector(this);
         mScale				= 1;
         mOldScale			= mScale;
@@ -111,23 +115,37 @@ public class PlanView extends View implements OnGestureListener {
         mCurDist			= 0;
         mMultiTouch 		= false;
 
+        // make a ckeckerboard pattern
+        Bitmap bm = Bitmap.createBitmap(new int[] { 0xFFFFFFFF, 0xFFEEEEEE,
+                                        0xFFEEEEEE, 0xFFFFFFFF
+                                                  }, 2, 2,
+                                        Bitmap.Config.RGB_565);
+        mBG = new BitmapShader(bm,
+                               Shader.TileMode.REPEAT,
+                               Shader.TileMode.REPEAT);
+        Matrix m = new Matrix();
+        m.setScale(15, 15);
+        mBG.setLocalMatrix(m);
+
         mTotalCirclePaint = new Paint();
-        mTotalCirclePaint.setARGB(255, 255, 225, 225);
+        mTotalCirclePaint.setARGB(255, 225, 225, 225);
+        mTotalCirclePaint.setStyle(Paint.Style.FILL);
+        mTotalCirclePaint.setShader(mBG);
 
         mActiveArcLinePaint 	= new Paint();
-        mInactiveArcLinePaint 	= new Paint();            
+        mInactiveArcLinePaint 	= new Paint();
         mActiveArcPointPaint 	= new Paint();
-        mInactiveArcPointPaint 	= new Paint();            
+        mInactiveArcPointPaint 	= new Paint();
         mActiveArcLinePaint.setStyle(Paint.Style.STROKE);
         mActiveArcLinePaint.setStrokeWidth(LINE_WIDTH);
         mInactiveArcLinePaint.setStyle(Paint.Style.STROKE);
         mInactiveArcLinePaint.setStrokeWidth(LINE_WIDTH);
-        
-    	mActiveArcLinePaint.setARGB(255, 0, 0, 0);
-    	mActiveArcPointPaint.setARGB(255, 0, 0, 0);
-    	mInactiveArcLinePaint.setARGB(255, 128, 128, 128);
-    	mInactiveArcPointPaint.setARGB(255, 128, 128, 128);
- 
+
+        mActiveArcLinePaint.setARGB(255, 0, 0, 0);
+        mActiveArcPointPaint.setARGB(255, 0, 0, 0);
+        mInactiveArcLinePaint.setARGB(255, 128, 128, 128);
+        mInactiveArcPointPaint.setARGB(255, 128, 128, 128);
+
         calcCoordinate();
     }
 
@@ -140,7 +158,15 @@ public class PlanView extends View implements OnGestureListener {
             Entry entry = mPlan.get(i);
             Paint arcPaint = new Paint();
             arcPaint.setColor(entry.bgcolor);
-            canvas.drawArc(mCircleRect, convertTime2Angle(entry.startTime), (float) convertTime2Angle(entry.endTime) - convertTime2Angle(entry.startTime), true, arcPaint);
+            int rcStartAngle = convertTime2Angle(entry.startTime);
+            int rcEndAngle = convertTime2Angle(entry.endTime);
+            int scStartAngle = rcStartAngle - 90;
+            int scEndAngle = rcEndAngle - 90;
+            if (rcStartAngle < rcEndAngle) {
+                canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle, true, arcPaint);
+            } else {
+                canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle + 360, true, arcPaint);
+            }
         }
 
         if ( mActiveArcIndex != ACTIVE_NONE ) {
@@ -148,15 +174,24 @@ public class PlanView extends View implements OnGestureListener {
 
             Paint curArcLinePaint;
             Paint curArcPointPaint;
-            if( 	mStatus == STATUS_ACTIVE_START ||
+            if ( 	mStatus == STATUS_ACTIVE_START ||
                     mStatus == STATUS_ACTIVE_END ) {
-            	curArcLinePaint = mActiveArcLinePaint;
-            	curArcPointPaint = mActiveArcPointPaint;
+                curArcLinePaint = mActiveArcLinePaint;
+                curArcPointPaint = mActiveArcPointPaint;
             } else {
-            	curArcLinePaint = mInactiveArcLinePaint;
-            	curArcPointPaint = mInactiveArcPointPaint;
+                curArcLinePaint = mInactiveArcLinePaint;
+                curArcPointPaint = mInactiveArcPointPaint;
             }
-            canvas.drawArc(mCircleRect, convertTime2Angle(entry.startTime), (float) convertTime2Angle(entry.endTime) - convertTime2Angle(entry.startTime), true, curArcLinePaint);
+            int rcStartAngle = convertTime2Angle(entry.startTime);
+            int rcEndAngle = convertTime2Angle(entry.endTime);
+            int scStartAngle = rcStartAngle - 90;
+            int scEndAngle = rcEndAngle - 90;
+            if (rcStartAngle < rcEndAngle) {
+                canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle, true, curArcLinePaint);
+            } else {
+                canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle + 360, true, curArcLinePaint);
+            }
+
             RectF rect1 = new RectF(mCenter.x, mCenter.y, mCenter.x, mCenter.y);
             rect1.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
             canvas.drawRect(rect1, curArcPointPaint);
@@ -165,7 +200,6 @@ public class PlanView extends View implements OnGestureListener {
             RectF rect2 = new RectF(mScale*point.x, mScale*point.y, mScale*point.x, mScale*point.y);
             rect2.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
             rect2.offset(mScale*(mMargin.x) + mScroll.x, mScale*(mMargin.y) + mScroll.y);
-
             canvas.drawRect(rect2, curArcPointPaint);
 
             point = getPoint(entry.endTime);
@@ -202,6 +236,9 @@ public class PlanView extends View implements OnGestureListener {
                 mCurDist = (float) Math.sqrt(Math.pow(originX2 - originX1, 2) + Math.pow(originY2 - originY1, 2));
                 if (action == MotionEvent.ACTION_MOVE) {
                     mScale = mOldScale + mCurDist / mOldDist - 1;
+                    if (mScale < 0.5) {
+                        mScale = (float) 0.5;
+                    }
                     if ( AppConfig.LOGD ) Log.d(AppConfig.TAG, "onTouchEvent() scale="+mScale);
 
                     calcCoordinate();
@@ -278,8 +315,6 @@ public class PlanView extends View implements OnGestureListener {
                 }
             }
             invalidate();
-        } else {
-            Toast.makeText(mContext, "out of Circle", Toast.LENGTH_LONG).show();
         }
         return false;
     }
@@ -303,18 +338,21 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     private int convertTime2Angle(int time) {
-        return (360 / 24 * time / 60 - 90);
+        return (360 / 24 * time / 60);
     }
 
     private double getAngle(float x, float y) {
-        return (180 - (Math.atan2(x , y)/Math.PI*180));
+        return (1 - (Math.atan2(x , y)/Math.PI))*180;
     }
 
     private Point getPoint(int time) {
         Point point = new Point();
-        int angle = convertTime2Angle(time);
-        int x = (int) (Math.cos(angle * Math.PI/2/90)*mRadius) + mRadius;
-        int y = (int) (Math.sin(angle * Math.PI/2/90)*mRadius) + mRadius;
+        int rcAngle = convertTime2Angle(time);	//RectangularCoordinate
+        int scAngle = rcAngle - 90;    			//ScreenCoordinate
+
+        int x = (int) (Math.cos(scAngle * Math.PI/2/90)*mRadius) + mRadius;
+        int y = (int) (Math.sin(scAngle * Math.PI/2/90)*mRadius) + mRadius;
+
         point.x = x;
         point.y = y;
         return point;
@@ -362,16 +400,22 @@ public class PlanView extends View implements OnGestureListener {
         float y = originY - (mRadius + mMargin.y ) * mScale - mScroll.y;
         if ( mStatus == STATUS_ACTIVE_START ) {
             double angle = getAngle(x, y);
+            angle = ((int)((angle+3.5) / 7.5)) * 7.5;
             Entry entry = mPlan.get(mActiveArcIndex);
+            //if( entry.endTime > (angle * 4) ) {
             entry.startTime = (int) (angle * 4);
             if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
+            //}
         } else if (mStatus == STATUS_ACTIVE_END) {
             double angle = getAngle(x, y);
+            angle = ((int)((angle+3.5) / 7.5)) * 7.5;
             Entry entry = mPlan.get(mActiveArcIndex);
+            //if( entry.startTime < (angle * 4) ) {
             entry.endTime = (int) (angle * 4);
             if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
+            //}
         }
     }
 

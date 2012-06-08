@@ -30,4 +30,11 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>ApplicationLib_src</name>
+			<type>2</type>
+			<location>D:/Project/Android/MyProject/ApplicationLib/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

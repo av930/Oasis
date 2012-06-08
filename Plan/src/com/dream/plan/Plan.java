@@ -35,8 +35,14 @@ public class Plan {
         }
 
         public boolean isInTime(int time) {
-            if ( startTime < time && time < endTime) {
-                return true;
+            if ( startTime < endTime) {
+                if ( startTime < time && time < endTime) {
+                    return true;
+                }
+            } else {
+                if ( startTime <= time || time <= endTime) {
+                    return true;
+                }
             }
             return false;
         }
