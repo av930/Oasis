@@ -1,3 +1,15 @@
+/*========================================================================
+Copyright (c) 2010 by LG Cappuccino Inc.  All Rights Reserved.
+
+			EDIT HISTORY FOR MODULE
+
+This section contains comments describing changes made to the module.
+Notice that changes are listed in reverse chronological order.
+
+when		who			what, where, why
+----------	----------	---------------------------------------------------
+2012/06/08	kihoon.kim	cappuccino Initial release.
+=========================================================================*/
 package com.dream.plan;
 
 import com.dream.plan.Plan.Entry;
@@ -68,6 +80,10 @@ public class PlanView extends View implements OnGestureListener {
     private float 					mOldDist;
     private boolean 				mMultiTouch;
     private Paint 					mTotalCirclePaint;
+    private Paint 					mActiveArcLinePaint;
+    private Paint 					mInactiveArcLinePaint;
+    private Paint 					mActiveArcPointPaint;
+    private Paint 					mInactiveArcPointPaint;
 
     public PlanView(Context context) {
         this(context,null,0);
@@ -98,6 +114,20 @@ public class PlanView extends View implements OnGestureListener {
         mTotalCirclePaint = new Paint();
         mTotalCirclePaint.setARGB(255, 255, 225, 225);
 
+        mActiveArcLinePaint 	= new Paint();
+        mInactiveArcLinePaint 	= new Paint();            
+        mActiveArcPointPaint 	= new Paint();
+        mInactiveArcPointPaint 	= new Paint();            
+        mActiveArcLinePaint.setStyle(Paint.Style.STROKE);
+        mActiveArcLinePaint.setStrokeWidth(LINE_WIDTH);
+        mInactiveArcLinePaint.setStyle(Paint.Style.STROKE);
+        mInactiveArcLinePaint.setStrokeWidth(LINE_WIDTH);
+        
+    	mActiveArcLinePaint.setARGB(255, 0, 0, 0);
+    	mActiveArcPointPaint.setARGB(255, 0, 0, 0);
+    	mInactiveArcLinePaint.setARGB(255, 128, 128, 128);
+    	mInactiveArcPointPaint.setARGB(255, 128, 128, 128);
+ 
         calcCoordinate();
     }
 
@@ -115,19 +145,17 @@ public class PlanView extends View implements OnGestureListener {
 
         if ( mActiveArcIndex != ACTIVE_NONE ) {
             Entry entry = mPlan.get(mActiveArcIndex);
-            Paint curArcLinePaint = new Paint();
-            Paint curArcPointPaint = new Paint();
-            curArcLinePaint.setStyle(Paint.Style.STROKE);
-            curArcLinePaint.setStrokeWidth(LINE_WIDTH);
-            if ( 	mStatus == STATUS_ACTIVE_START ||
-                    mStatus == STATUS_ACTIVE_END) {
-                curArcLinePaint.setARGB(255, 0, 0, 0);
-                curArcPointPaint.setARGB(255, 0, 0, 0);
-            } else {
-                curArcLinePaint.setARGB(255, 128, 128, 128);
-                curArcPointPaint.setARGB(255, 128, 128, 128);
-            }
 
+            Paint curArcLinePaint;
+            Paint curArcPointPaint;
+            if( 	mStatus == STATUS_ACTIVE_START ||
+                    mStatus == STATUS_ACTIVE_END ) {
+            	curArcLinePaint = mActiveArcLinePaint;
+            	curArcPointPaint = mActiveArcPointPaint;
+            } else {
+            	curArcLinePaint = mInactiveArcLinePaint;
+            	curArcPointPaint = mInactiveArcPointPaint;
+            }
             canvas.drawArc(mCircleRect, convertTime2Angle(entry.startTime), (float) convertTime2Angle(entry.endTime) - convertTime2Angle(entry.startTime), true, curArcLinePaint);
             RectF rect1 = new RectF(mCenter.x, mCenter.y, mCenter.x, mCenter.y);
             rect1.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
@@ -279,7 +307,7 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     private double getAngle(float x, float y) {
-        return (360 - (Math.atan2(x , y)/Math.PI*180+180));
+        return (180 - (Math.atan2(x , y)/Math.PI*180));
     }
 
     private Point getPoint(int time) {
