@@ -6,8 +6,9 @@
         android:id="@+id/planview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#FFFFFFFF"
+        android:background="#FFAAAAAA"
         android:clickable="true"    
+        android:scrollbars="vertical"
         />
     <LinearLayout
 	    android:layout_width="fill_parent"

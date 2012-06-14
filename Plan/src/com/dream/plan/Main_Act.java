@@ -20,6 +20,7 @@ import android.widget.Button;
 public class Main_Act extends Activity {
     PlanView	mPlanView;
     Button 		mAddButton;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
