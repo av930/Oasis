@@ -31,6 +31,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.OverScroller;
 
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.lge.config.AppConfig;
 import com.dream.plan.Plan.Entry;
 
@@ -45,10 +49,9 @@ public class PlanView extends View implements OnGestureListener {
 
     private static final int		POINT_SIZE 				= -8;	// 시작 시간, 종료 시간  영역
     private static final int		TOUCH_AREA 				= -30;	// 시작 시간, 종료 시간  터치영역
-    private static final int		MARGIN_SIZE 			= 30;	// 여백
     private static final int		LINE_WIDTH 				= 2;	//
 
-    private static final float		MIN_SCALE 				= (float) 0.5;
+    private static final float		MIN_SCALE 				= (float) 1.0;
 
     private final GestureDetector 	mGestureDetector;		// Touch 인식
     private Shader 					mBG;					// 빈공간일때 배경
@@ -64,7 +67,6 @@ public class PlanView extends View implements OnGestureListener {
     private int						mStatus;				// 현재의 상태
     private int 					mActiveArcIndex;		// 선택된 항목 인덱스
     private int 					mRadius;				// 반지름
-    private ExPoint 				mMargin;				// 여백
     private ExRectF					mCircleRect;			// 원 영역
     private ExPoint 				mCenter;				// 원 중심
     private OverScroller 			mScroller;				// 스크롤
@@ -77,6 +79,14 @@ public class PlanView extends View implements OnGestureListener {
     private float 					mOldDist;
     private boolean 				mMultiTouch;			// 2 Touch 중인지...
 
+    Timer timer = new Timer();
+    TimerTask timertask = new TimerTask() {
+        public void run() {
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getCurrX()="+mScroller.getCurrX()+", getCurrY()="+mScroller.getCurrY());
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getScrollX()="+getScrollX()+", getScrollY()="+getScrollY());
+        }
+    };
+
     public PlanView(Context context) {
         this(context,null,0);
     }
@@ -87,7 +97,7 @@ public class PlanView extends View implements OnGestureListener {
 
     public PlanView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        mGestureDetector 	= new GestureDetector(this);
+        mGestureDetector 	= new GestureDetector(context, this);
 
         Bitmap bm = Bitmap.createBitmap(new int[] { 0xFFFFFFFF, 0xFFEEEEEE, 0xFFEEEEEE, 0xFFFFFFFF }, // make a ckeckerboard pattern
                                         2, 2, Bitmap.Config.RGB_565);
@@ -123,34 +133,35 @@ public class PlanView extends View implements OnGestureListener {
         mActiveArcIndex 	= ACTIVE_NONE;
         mStatus 			= STATUS_NO_ACTIVE;
 
-        mMargin 			= new ExPoint(MARGIN_SIZE, MARGIN_SIZE);
-        mScroller				= new OverScroller(mContext);
+        mScroller			= new OverScroller(mContext);
         mScrollMin			= new ExPoint(0, 0);
         mScrollMax			= new ExPoint(0, 0);
 
-        mRadius 			= (AppConfig.mShortAxis)/2 - mMargin.x;
+        mRadius 			= 0;
         mScale				= 1;
         mOldScale			= 1;
         mTouchDownScale		= mScale;
-        mMargin.magnify(mScale);
 
         mOldDist 			= 0;
         mCurDist			= 0;
         mMultiTouch 		= false;
+
+        timer.schedule(timertask, new Date(), 1000);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int shortAxis;
-        if (getWidth()>getHeight()) {
-            shortAxis = getHeight();
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int height = MeasureSpec.getSize(heightMeasureSpec);
+
+        if (width < height) {
+            mRadius 			= (width - getPaddingLeft() - getPaddingRight())/2;
         } else {
-            shortAxis = getWidth();
+            mRadius 			= (height - getPaddingTop() - getPaddingBottom())/2;
         }
 
-        mRadius 			= shortAxis / 2 - mMargin.x;
         calcCoordinate();
         setScrollMinMax();
     }
@@ -203,100 +214,55 @@ public class PlanView extends View implements OnGestureListener {
             Point point = getPoint(entry.startTime);
             RectF rect2 = new RectF(mScale*point.x, mScale*point.y, mScale*point.x, mScale*point.y);
             rect2.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
-            rect2.offset(mScale*(mMargin.x) - mScroller.getCurrX(), mScale*(mMargin.y) - mScroller.getCurrY());
+            rect2.offset(getPaddingLeft(), getPaddingTop());
             canvas.drawRect(rect2, curArcPointPaint);
 
             point = getPoint(entry.endTime);
             RectF rect3 = new RectF(mScale*point.x, mScale*point.y, mScale*point.x, mScale*point.y);
             rect3.inset(mScale*POINT_SIZE, mScale*POINT_SIZE);
-            rect3.offset(mScale*(mMargin.x) - mScroller.getCurrX(), mScale*(mMargin.y) - mScroller.getCurrY());
+            rect3.offset(getPaddingLeft(), getPaddingTop());
             canvas.drawRect(rect3, curArcPointPaint);
         }
     }
+
     @Override
-	protected void dispatchDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
-		super.dispatchDraw(canvas);
-	}
-
-	@Override
-	public void draw(Canvas canvas) {
-		// TODO Auto-generated method stub
-		super.draw(canvas);
-	}
-
-	private int getScrollRange() {
-    	/*
-         int scrollRange = 0; 
-         if (getChildCount() > 0) {
-             View child = getChildAt(0);
-             scrollRange = Math.max(0,  
-                     child.getHeight() - (getHeight() - mPaddingBottom - mPaddingTop));
-         }                                                                             
-         return scrollRange;
-         */
-    	return 1000;
+    protected int computeVerticalScrollRange() {
+        return (int)(mRadius * 2 * mScale)+getPaddingTop()+getPaddingBottom();
     }
 
-	static int xxxx1 = 50;
-    static int xxxx2 = 300;
-    static int yyyy1 = 50;
-    static int yyyy2 = 300;
-    
     @Override
-	public void computeScroll() {		
-		super.computeScroll();		
-        if (mScroller.computeScrollOffset()) {                                                                                                            
-           int oldX = mScroller.getCurrX();  ;                                                                                                                           
-           int oldY = mScroller.getCurrY();  ;                                                                                                                           
-           int x = mScroller.getCurrX();                                                                                                                  
-           int y = mScroller.getCurrY();                                                                                                                  
-                                   
-           
-           //if (oldX != x || oldY != y) {                                                                                                                  
-               final int range = getScrollRange();         
-               setOverScrollMode(OVER_SCROLL_ALWAYS);
-               //scrollTo(xxxx1,yyyy2);
-               final int overscrollMode = getOverScrollMode();                                                                                            
-               final boolean canOverscroll = overscrollMode == OVER_SCROLL_ALWAYS ||                                                                      
-                       (overscrollMode == OVER_SCROLL_IF_CONTENT_SCROLLS && range > 0);                                                                   
-               
-               overScrollBy(xxxx1, yyyy1, xxxx2, yyyy2, 0, range,                                                                                     
-                       0, 1000, true);    
-               Log.i(AppConfig.TAG, "xxxx1"+xxxx1);
-               xxxx1 += 5;
-               xxxx2 += 5;
-               yyyy1 += 5;
-               yyyy2 += 5;
-               
-               /*
-               onScrollChanged(mScrollX, mScrollY, oldX, oldY);                                                                                           
-                                                                                                                                                          
-               if (canOverscroll) {                                                                                                                       
-                   if (y < 0 && oldY >= 0) {                                                                                                              
-                       mEdgeGlowTop.onAbsorb((int) mScroller.getCurrVelocity());                                                                          
-                   } else if (y > range && oldY <= range) {                                                                                               
-                       mEdgeGlowBottom.onAbsorb((int) mScroller.getCurrVelocity());                                                                       
-                   }                                                                                                                                      
-               } 
-               */                                                                                                                                         
-           //}                                                                                                                                              
-                                                                                                                                                          
-           awakenScrollBars();                                                                                                                            
-                                                                                                                                                          
-           // Keep on drawing until the animation has finished.                                                                                           
-           postInvalidate();		
-        } else {             
-        	/*
-            if (mFlingStrictSpan != null) {                                                                                                               
-                mFlingStrictSpan.finish();                                                                                                                
-                mFlingStrictSpan = null;                                                                                                                  
-            } 
-            */                                                                                                                                            
-        }        
-	}
+    protected int computeHorizontalScrollRange() {
+        return (int)(mRadius * 2 * mScale)+getPaddingLeft()+getPaddingRight();
+    }
 
-	@Override
+    @Override
+    protected int computeVerticalScrollExtent() {
+        return getHeight();
+    }
+
+    @Override
+    protected int computeHorizontalScrollExtent() {
+        return  getWidth();
+    }
+
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        if (mScroller.computeScrollOffset()) {
+            final int verticalScrollRange 	= computeVerticalScrollRange();
+            final int horizontalScrollRange = computeHorizontalScrollRange();
+            final int verticalScrollExt 	= computeVerticalScrollExtent();
+            final int horizontalScrollExt 	= computeHorizontalScrollExtent();
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() verticalScrollRange="+verticalScrollRange+", verticalScrollExt="+verticalScrollExt);
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() horizontalScrollRange="+horizontalScrollRange+", horizontalScrollExt="+horizontalScrollExt);
+            overScrollBy(0, 0, getScrollX(), getScrollY(), verticalScrollRange, horizontalScrollRange, verticalScrollExt, horizontalScrollExt, true);
+            awakenScrollBars();
+            postInvalidate();
+        } else {
+        }
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (mGestureDetector.onTouchEvent(event))
             return true;
@@ -305,11 +271,6 @@ public class PlanView extends View implements OnGestureListener {
         float originY1 = event.getY();
         //if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," onTouchEvent() event = " + event);
         switch (action) {
-        case MotionEvent.ACTION_DOWN:
-            mScroller.forceFinished(true);
-            calcCoordinate();
-            TouchDownEvent(event);
-            break;
         case MotionEvent.ACTION_UP:
             TouchUpEvent(event);
             break;
@@ -330,7 +291,6 @@ public class PlanView extends View implements OnGestureListener {
                     checkInvalidScrollRange();
                     mOldScale = mScale;
                     if ( AppConfig.LOGD ) Log.d(AppConfig.TAG, "onTouchEvent() scale="+mScale);
-
                     calcCoordinate();
                     invalidate();
                 } else if (action == (MotionEvent.ACTION_POINTER_DOWN | 0x100)) {
@@ -350,8 +310,43 @@ public class PlanView extends View implements OnGestureListener {
         return super.onTouchEvent(event);
     }
 
-    public boolean onDown(MotionEvent arg0) {
+    public boolean onDown(MotionEvent event) {
         if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onDown()");
+        mScroller.forceFinished(true);
+        calcCoordinate();
+
+        float originX = event.getX();
+        float originY = event.getY();
+
+        if ( mActiveArcIndex != ACTIVE_NONE) {
+            Entry entry = mPlan.get(mActiveArcIndex);
+
+            Point startPoint = getPoint(entry.startTime);
+            ExRectF startRect = new ExRectF(startPoint.x, startPoint.y, startPoint.x, startPoint.y);
+            startRect.magnify(mScale);
+            startRect.offset(getPaddingLeft(), getPaddingTop());
+            startRect.offset(-mScroller.getCurrX(), -mScroller.getCurrY());
+            startRect.inset(TOUCH_AREA, TOUCH_AREA);
+
+            Point endPoint = getPoint(entry.endTime);
+            ExRectF endRect = new ExRectF(endPoint.x, endPoint.y, endPoint.x, endPoint.y);
+            endRect.magnify(mScale);
+            endRect.offset(getPaddingLeft(), getPaddingTop());
+            endRect.offset(-mScroller.getCurrX(), -mScroller.getCurrY());
+            endRect.inset(TOUCH_AREA, TOUCH_AREA);
+
+            if (startRect.contains(originX, originY)) {
+                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," startRect touch down");
+                mStatus = STATUS_ACTIVE_START;
+                invalidate();
+                return true;
+            } else if (endRect.contains(originX, originY)) {
+                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," endRect touch down");
+                mStatus = STATUS_ACTIVE_END;
+                invalidate();
+                return true;
+            }
+        }
         return false;
     }
 
@@ -384,8 +379,6 @@ public class PlanView extends View implements OnGestureListener {
             return false;
 
         if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onScroll() distanceX="+distanceX+", distanceY="+distanceY);
-        //mScroller.x -= distanceX;
-        //mScroller.y -= distanceY;
 
         if (mScroller.getCurrX()+distanceX < mScrollMin.x) {
             distanceX = (mScrollMin.x - mScroller.getCurrX());
@@ -399,9 +392,12 @@ public class PlanView extends View implements OnGestureListener {
         if (mScroller.getCurrY()+distanceY > mScrollMax.y) {
             distanceY = (mScrollMax.y - mScroller.getCurrY());
         }
+
         mScroller.startScroll(mScroller.getCurrX(), mScroller.getCurrY(), (int)distanceX, (int)distanceY, 0);
         mScroller.abortAnimation();
+
         calcCoordinate();
+        scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
         invalidate();
         return false;
     }
@@ -415,8 +411,8 @@ public class PlanView extends View implements OnGestureListener {
 
         float originX = e.getX();
         float originY = e.getY();
-        float x = originX - (mRadius + mMargin.x ) * mScale + mScroller.getCurrX();
-        float y = originY - (mRadius + mMargin.y ) * mScale + mScroller.getCurrY();
+        float x = originX - mRadius * mScale + mScroller.getCurrX() - getPaddingLeft();
+        float y = originY - mRadius * mScale + mScroller.getCurrY() - getPaddingTop();
         if ( Math.pow((x), 2) + Math.pow((y), 2) <  Math.pow(mRadius * mScale, 2) ) {
             double angle = getAngle(x, y);
             if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"angle="+angle);
@@ -443,37 +439,27 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     private void calcCoordinate() {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"calcCoordinate()");
         mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );
         mCenter 			= new ExPoint(mRadius, mRadius);
 
-        mCircleRect.offset(mMargin.x, mMargin.y);
         mCircleRect.magnify(mScale);
-        mCircleRect.offset(-mScroller.getCurrX() , -mScroller.getCurrY());
-
-        mCenter.offset(mMargin.x, mMargin.y);
+        mCircleRect.offset(getPaddingLeft(), getPaddingTop());
         mCenter.magnify(mScale);
-        mCenter.offset(-mScroller.getCurrX() , -mScroller.getCurrY());
+        mCenter.offset(getPaddingLeft(), getPaddingTop());
     }
 
     private void setScrollMinMax() {
-        int scrollX = (int)(2*(mRadius + mMargin.x)*mScale) - getWidth();
-        int scrollY = (int)(2*(mRadius + mMargin.y)*mScale) - getHeight();
-        if ( scrollX >= 0 ) {
-            mScrollMin.x = 0;
-            mScrollMax.x = scrollX;
-        } else {
-            mScrollMin.x = scrollX;
-            mScrollMax.x = 0;
-        }
-        if ( scrollY >= 0 ) {
-            mScrollMin.y = 0;
-            mScrollMax.y = scrollY;
-        } else {
-            mScrollMin.y = scrollY;
-            mScrollMax.y = 0;
-        }
+        int scrollX = (int)(2*mRadius*mScale) + getPaddingLeft() + getPaddingRight() - getWidth();
+        int scrollY = (int)(2*mRadius*mScale) + getPaddingTop() + getPaddingBottom() - getHeight();
+        if (scrollX < 0)
+            scrollX = 0;
+        if (scrollY < 0)
+            scrollY = 0;
+        mScrollMax.x = scrollX;
+        mScrollMax.y = scrollY;
     }
-    
+
     private void checkInvalidScrollRange() {
         int diff;
         boolean isExpand = false;
@@ -499,6 +485,7 @@ public class PlanView extends View implements OnGestureListener {
             mScroller.startScroll(mScroller.getCurrX(), mScroller.getCurrY(), (int)0, isExpand ? diff : -diff, 0);
             mScroller.abortAnimation();
         }
+        scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
     }
 
     private int convertTime2Angle(int time) {
@@ -522,46 +509,11 @@ public class PlanView extends View implements OnGestureListener {
         return point;
     }
 
-    private void TouchDownEvent(MotionEvent event) {
-        float originX = event.getX();
-        float originY = event.getY();
-
-        if ( mActiveArcIndex != ACTIVE_NONE) {
-            Entry entry = mPlan.get(mActiveArcIndex);
-
-            Point startPoint = getPoint(entry.startTime);
-            ExRectF startRect = new ExRectF(startPoint.x, startPoint.y, startPoint.x, startPoint.y);
-            startRect.offset(mMargin.x, mMargin.y);
-            startRect.magnify(mScale);
-            startRect.offset(-mScroller.getCurrX(), -mScroller.getCurrY());
-            startRect.inset(TOUCH_AREA, TOUCH_AREA);
-
-            Point endPoint = getPoint(entry.endTime);
-            ExRectF endRect = new ExRectF(endPoint.x, endPoint.y, endPoint.x, endPoint.y);
-            endRect.offset(mMargin.x, mMargin.y);
-            endRect.magnify(mScale);
-            endRect.offset(-mScroller.getCurrX(), -mScroller.getCurrY());
-            endRect.inset(TOUCH_AREA, TOUCH_AREA);
-
-            if (startRect.contains(originX, originY)) {
-                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," startRect touch down");
-                mStatus = STATUS_ACTIVE_START;
-                invalidate();
-                return ;
-            } else if (endRect.contains(originX, originY)) {
-                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," endRect touch down");
-                mStatus = STATUS_ACTIVE_END;
-                invalidate();
-                return ;
-            }
-        }
-    }
-
     private void TouchMoveEvent(MotionEvent event) {
         float originX = event.getX();
         float originY = event.getY();
-        float x = originX - (mRadius + mMargin.x ) * mScale + mScroller.getCurrX();
-        float y = originY - (mRadius + mMargin.y ) * mScale + mScroller.getCurrY();
+        float x = originX - mRadius * mScale - getPaddingLeft() + mScroller.getCurrX();
+        float y = originY - mRadius * mScale - getPaddingTop() + mScroller.getCurrY();
         if ( mStatus == STATUS_ACTIVE_START ) {
             double angle = getAngle(x, y);
             angle = ((int)((angle+3.5) / 7.5)) * 7.5;
@@ -622,6 +574,7 @@ public class PlanView extends View implements OnGestureListener {
                 if (mScroller.isFinished()==false) {
                     mScroller.computeScrollOffset();
                     calcCoordinate();
+                    scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
                     invalidate();
                     Message updateMsg = mFlingHandler.obtainMessage(MSG_UPDATE);
                     mFlingHandler.sendMessage(updateMsg);
