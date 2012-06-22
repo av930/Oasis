@@ -29,6 +29,7 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.EdgeEffect;
 import android.widget.OverScroller;
 
 import java.util.Date;
@@ -79,11 +80,16 @@ public class PlanView extends View implements OnGestureListener {
     private float 					mOldDist;
     private boolean 				mMultiTouch;			// 2 Touch ¡ﬂ¿Œ¡ˆ...
 
+    private EdgeEffect				mEdgeGlowTop;
+    private EdgeEffect				mEdgeGlowBottom;
+    private EdgeEffect				mEdgeGlowLeft;
+    private EdgeEffect				mEdgeGlowRight;
+
     Timer timer = new Timer();
     TimerTask timertask = new TimerTask() {
         public void run() {
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getCurrX()="+mScroller.getCurrX()+", getCurrY()="+mScroller.getCurrY());
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getScrollX()="+getScrollX()+", getScrollY()="+getScrollY());
+            //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getCurrX()="+mScroller.getCurrX()+", getCurrY()="+mScroller.getCurrY());
+            //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"TimerTask getScrollX()="+getScrollX()+", getScrollY()="+getScrollY());
         }
     };
 
@@ -146,6 +152,11 @@ public class PlanView extends View implements OnGestureListener {
         mCurDist			= 0;
         mMultiTouch 		= false;
 
+        mEdgeGlowTop = new EdgeEffect(mContext);
+        mEdgeGlowBottom = new EdgeEffect(mContext);
+        mEdgeGlowLeft = new EdgeEffect(mContext);
+        mEdgeGlowRight = new EdgeEffect(mContext);
+
         timer.schedule(timertask, new Date(), 1000);
     }
 
@@ -164,11 +175,71 @@ public class PlanView extends View implements OnGestureListener {
 
         calcCoordinate();
         setScrollMinMax();
+        mEdgeGlowTop.setSize(width, height);
+        mEdgeGlowBottom.setSize(width, height);
+        mEdgeGlowLeft.setSize(height, width);
+        mEdgeGlowRight.setSize(height, width);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        final int scrollX = getScrollX();
+        final int scrollY = getScrollY();
+        if (!mEdgeGlowTop.isFinished()) {
+            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"draw()");
+            final int restoreCount = canvas.save();
+
+            canvas.translate(getPaddingLeft()+scrollX, scrollY);
+            if (mEdgeGlowTop.draw(canvas)) {
+                invalidate();
+            }
+
+            canvas.restoreToCount(restoreCount);
+        }
+        if (!mEdgeGlowBottom.isFinished()) {
+            final int restoreCount = canvas.save();
+
+            final int width = getWidth();
+            final int height = getHeight();
+            canvas.translate(scrollX+getPaddingLeft(), height+scrollY);
+            canvas.rotate(180, width/2, 0);
+            if (mEdgeGlowBottom.draw(canvas)) {
+                invalidate();
+            }
+
+            canvas.restoreToCount(restoreCount);
+        }
+        if (!mEdgeGlowLeft.isFinished()) {
+            final int restoreCount = canvas.save();
+
+            final int height = getHeight() - getPaddingTop() - getPaddingBottom();
+            canvas.rotate(270);
+            canvas.translate(-height+getPaddingTop(), scrollX);
+            if (mEdgeGlowLeft.draw(canvas)) {
+                invalidate();
+            }
+
+            canvas.restoreToCount(restoreCount);
+        }
+        if (!mEdgeGlowRight.isFinished()) {
+            final int restoreCount = canvas.save();
+
+            final int width = getWidth();
+            canvas.rotate(90);
+            canvas.translate(-getPaddingTop(), -scrollX-width);
+            if (mEdgeGlowRight.draw(canvas)) {
+                invalidate();
+            }
+
+            canvas.restoreToCount(restoreCount);
+        }
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
         canvas.drawArc(mCircleRect, 0, (float) (360), true, mTotalCirclePaint);
         int size = mPlan.size();
         for (int i=0;i<size;i++) {
@@ -249,16 +320,22 @@ public class PlanView extends View implements OnGestureListener {
     public void computeScroll() {
         super.computeScroll();
         if (mScroller.computeScrollOffset()) {
-            final int verticalScrollRange 	= computeVerticalScrollRange();
-            final int horizontalScrollRange = computeHorizontalScrollRange();
-            final int verticalScrollExt 	= computeVerticalScrollExtent();
-            final int horizontalScrollExt 	= computeHorizontalScrollExtent();
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() verticalScrollRange="+verticalScrollRange+", verticalScrollExt="+verticalScrollExt);
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() horizontalScrollRange="+horizontalScrollRange+", horizontalScrollExt="+horizontalScrollExt);
-            overScrollBy(0, 0, getScrollX(), getScrollY(), verticalScrollRange, horizontalScrollRange, verticalScrollExt, horizontalScrollExt, true);
-            awakenScrollBars();
-            postInvalidate();
-        } else {
+            int oldX = getScrollX();
+            int oldY = getScrollY();
+            int x = mScroller.getCurrX();
+            int y = mScroller.getCurrY();
+            if (oldX != x || oldY != y) {
+                final int verticalScrollRange 	= computeVerticalScrollRange();
+                final int horizontalScrollRange = computeHorizontalScrollRange();
+                final int verticalScrollExt 	= computeVerticalScrollExtent();
+                final int horizontalScrollExt 	= computeHorizontalScrollExtent();
+                //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() verticalScrollRange="+verticalScrollRange+", verticalScrollExt="+verticalScrollExt);
+                //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll() horizontalScrollRange="+horizontalScrollRange+", horizontalScrollExt="+horizontalScrollExt);
+                overScrollBy(0, 0, getScrollX(), getScrollY(), verticalScrollRange, horizontalScrollRange, verticalScrollExt, horizontalScrollExt, true);
+
+                awakenScrollBars();
+                postInvalidate();
+            }
         }
     }
 
@@ -269,7 +346,7 @@ public class PlanView extends View implements OnGestureListener {
         int action = event.getAction();
         float originX1 = event.getX();
         float originY1 = event.getY();
-        //if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," onTouchEvent() event = " + event);
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," onTouchEvent() event = " + event);
         switch (action) {
         case MotionEvent.ACTION_UP:
             TouchUpEvent(event);
@@ -290,7 +367,7 @@ public class PlanView extends View implements OnGestureListener {
                     setScrollMinMax();
                     checkInvalidScrollRange();
                     mOldScale = mScale;
-                    if ( AppConfig.LOGD ) Log.d(AppConfig.TAG, "onTouchEvent() scale="+mScale);
+                    //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG, "onTouchEvent() scale="+mScale);
                     calcCoordinate();
                     invalidate();
                 } else if (action == (MotionEvent.ACTION_POINTER_DOWN | 0x100)) {
@@ -311,7 +388,7 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     public boolean onDown(MotionEvent event) {
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onDown()");
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onDown()");
         mScroller.forceFinished(true);
         calcCoordinate();
 
@@ -336,12 +413,12 @@ public class PlanView extends View implements OnGestureListener {
             endRect.inset(TOUCH_AREA, TOUCH_AREA);
 
             if (startRect.contains(originX, originY)) {
-                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," startRect touch down");
+                //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," startRect touch down");
                 mStatus = STATUS_ACTIVE_START;
                 invalidate();
                 return true;
             } else if (endRect.contains(originX, originY)) {
-                if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," endRect touch down");
+                //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," endRect touch down");
                 mStatus = STATUS_ACTIVE_END;
                 invalidate();
                 return true;
@@ -359,6 +436,7 @@ public class PlanView extends View implements OnGestureListener {
             return false;
 
         if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onFling() velocityX="+velocityX+", velocityY="+velocityY);
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onFling() velocityX="+velocityX+", velocityY="+velocityY);
 
         mScroller.fling(mScroller.getCurrX(), mScroller.getCurrY(), (int)-velocityX, (int)-velocityY, mScrollMin.x, mScrollMax.x, mScrollMin.y, mScrollMax.y);
         Message msg = mFlingHandler.obtainMessage(MSG_UPDATE);
@@ -367,7 +445,7 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     public void onLongPress(MotionEvent e) {
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onLongPress()");
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onLongPress()");
     }
 
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
@@ -377,19 +455,22 @@ public class PlanView extends View implements OnGestureListener {
         }
         if (mMultiTouch)
             return false;
-
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onScroll() distanceX="+distanceX+", distanceY="+distanceY);
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onScroll() distanceX="+distanceX+", distanceY="+distanceY);
 
         if (mScroller.getCurrX()+distanceX < mScrollMin.x) {
+            mEdgeGlowLeft.onPull(distanceX/getWidth());
             distanceX = (mScrollMin.x - mScroller.getCurrX());
         }
         if (mScroller.getCurrX()+distanceX > mScrollMax.x) {
+            mEdgeGlowRight.onPull(distanceX/getWidth());
             distanceX = (mScrollMax.x - mScroller.getCurrX());
         }
         if (mScroller.getCurrY()+distanceY < mScrollMin.y) {
+            mEdgeGlowTop.onPull(distanceY/getHeight());
             distanceY = (mScrollMin.y - mScroller.getCurrY());
         }
         if (mScroller.getCurrY()+distanceY > mScrollMax.y) {
+            mEdgeGlowBottom.onPull(distanceY/getHeight());
             distanceY = (mScrollMax.y - mScroller.getCurrY());
         }
 
@@ -403,11 +484,11 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     public void onShowPress(MotionEvent e) {
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onShowPress()");
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onShowPress()");
     }
 
     public boolean onSingleTapUp(MotionEvent e) {
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onSingleTapUp()");
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onSingleTapUp()");
 
         float originX = e.getX();
         float originY = e.getY();
@@ -415,7 +496,7 @@ public class PlanView extends View implements OnGestureListener {
         float y = originY - mRadius * mScale + mScroller.getCurrY() - getPaddingTop();
         if ( Math.pow((x), 2) + Math.pow((y), 2) <  Math.pow(mRadius * mScale, 2) ) {
             double angle = getAngle(x, y);
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"angle="+angle);
+            //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"angle="+angle);
             int size = mPlan.size();
             mActiveArcIndex = ACTIVE_NONE;
             mStatus = STATUS_NO_ACTIVE;
@@ -423,7 +504,7 @@ public class PlanView extends View implements OnGestureListener {
                 Entry entry = mPlan.get(i);
                 int time = (int)(angle * 4);
                 if ( entry.isInTime(time) ) {
-                    if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," i = "+i);
+                    //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," i = "+i);
                     mActiveArcIndex = i;
                     mStatus = STATUS_ACTIVE_INDEX;
                 }
@@ -439,7 +520,7 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     private void calcCoordinate() {
-        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"calcCoordinate()");
+        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"calcCoordinate()");
         mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );
         mCenter 			= new ExPoint(mRadius, mRadius);
 
@@ -452,12 +533,8 @@ public class PlanView extends View implements OnGestureListener {
     private void setScrollMinMax() {
         int scrollX = (int)(2*mRadius*mScale) + getPaddingLeft() + getPaddingRight() - getWidth();
         int scrollY = (int)(2*mRadius*mScale) + getPaddingTop() + getPaddingBottom() - getHeight();
-        if (scrollX < 0)
-            scrollX = 0;
-        if (scrollY < 0)
-            scrollY = 0;
-        mScrollMax.x = scrollX;
-        mScrollMax.y = scrollY;
+        mScrollMax.x = Math.max(0, scrollX);
+        mScrollMax.y = Math.max(0, scrollY);
     }
 
     private void checkInvalidScrollRange() {
@@ -519,14 +596,14 @@ public class PlanView extends View implements OnGestureListener {
             angle = ((int)((angle+3.5) / 7.5)) * 7.5;
             Entry entry = mPlan.get(mActiveArcIndex);
             entry.startTime = (int) (angle * 4);
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
+            //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
         } else if (mStatus == STATUS_ACTIVE_END) {
             double angle = getAngle(x, y);
             angle = ((int)((angle+3.5) / 7.5)) * 7.5;
             Entry entry = mPlan.get(mActiveArcIndex);
             entry.endTime = (int) (angle * 4);
-            if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
+            //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," Move angle = "+angle);
             invalidate();
         }
     }
@@ -539,7 +616,16 @@ public class PlanView extends View implements OnGestureListener {
             if ( mMultiTouch ) {
                 mMultiTouch = false;
             }
+            endDrag();
         }
+    }
+
+    private void endDrag() {
+        if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"computeScroll endDrag()");
+        mEdgeGlowTop.onRelease();
+        mEdgeGlowBottom.onRelease();
+        mEdgeGlowLeft.onRelease();
+        mEdgeGlowRight.onRelease();
     }
 
     class ExRectF extends RectF {
@@ -572,12 +658,36 @@ public class PlanView extends View implements OnGestureListener {
             switch (msg.what)	{
             case MSG_UPDATE:
                 if (mScroller.isFinished()==false) {
+                    int curX, curY;
+                    int oldX = getScrollX();
+                    int oldY = getScrollY();
+
                     mScroller.computeScrollOffset();
                     calcCoordinate();
                     scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
+                    curX = mScroller.getCurrX();
+                    curY = mScroller.getCurrY();
+
+                    if (oldY>mScrollMin.y && curY<=mScrollMin.y) {
+                        mEdgeGlowTop.onAbsorb((int) mScroller.getCurrVelocity());
+                    }
+                    if (oldY<mScrollMax.y && curY>=mScrollMax.y) {
+                        mEdgeGlowBottom.onAbsorb((int) mScroller.getCurrVelocity());
+                    }
+                    if (oldX>mScrollMin.x && curX<=mScrollMin.x) {
+                        mEdgeGlowLeft.onAbsorb((int) mScroller.getCurrVelocity());
+                    }
+                    if (oldX<mScrollMax.x && curX>=mScrollMax.x) {
+                        mEdgeGlowRight.onAbsorb((int) mScroller.getCurrVelocity());
+                    }
                     invalidate();
                     Message updateMsg = mFlingHandler.obtainMessage(MSG_UPDATE);
                     mFlingHandler.sendMessage(updateMsg);
+                } else {
+                    mEdgeGlowTop.onRelease();
+                    mEdgeGlowBottom.onRelease();
+                    mEdgeGlowLeft.onRelease();
+                    mEdgeGlowRight.onRelease();
                 }
                 break;
             }

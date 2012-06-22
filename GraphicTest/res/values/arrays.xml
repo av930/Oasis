@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="widgetPreview">
+        <item>@drawable/preview01</item>
+        <item>@drawable/preview02</item>
+        <item>@drawable/preview03</item>
+    </array>
+</resources>

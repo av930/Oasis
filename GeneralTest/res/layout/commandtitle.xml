@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent" 
+        android:layout_height="?android:attr/windowTitleSize"
+    android:stretchColumns="1">
+
+
+        <TextView android:id="@+commandtitle/imagetitle" 
+            style="?android:attr/windowTitleStyle"
+            android:background="@null"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            />
+
+
+
+<ImageButton android:padding="0px" android:paddingLeft="0px" android:paddingTop="0px" android:paddingRight="0px" android:paddingBottom="0px" 
+android:text="Show Diaglog" android:id="@+id/commandbutton"  android:layout_alignParentRight="true" android:layout_width="25dip"
+            android:layout_height="25dip" 
+            />
+
+</RelativeLayout>

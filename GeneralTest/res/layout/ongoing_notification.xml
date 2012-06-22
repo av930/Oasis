@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ongoing_notification"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView android:id="@+id/icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/notify_panel_notification_icon_bg_tile"
+        android:scaleType="center"/>
+    <include layout="@layout/ongoing_notification_large_icon" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+</LinearLayout>

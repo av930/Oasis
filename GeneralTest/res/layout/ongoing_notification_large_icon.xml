@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ongoing_notification_large_icon"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp">
+    <LinearLayout
+        android:id="@+id/line1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/trackname"
+            android:textAppearance="@style/EventContent.Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+	<TextView android:id="@+id/artistalbum"            
+		style="@style/EventContent"            
+		android:layout_gravity="left"            
+		android:maxLines="2"            
+		android:scrollHorizontally="true"            
+		android:ellipsize="end"            
+		android:layout_width="wrap_content"            
+		android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/line3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView android:id="@+id/trackname2"
+            android:textAppearance="@style/EventContent.Title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal"
+            android:paddingTop="0dp"/>
+        <TextView android:id="@+id/info"
+            android:textAppearance="@style/EventContent.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:singleLine="true"
+            android:gravity="center"
+            android:paddingLeft="8dp"/>
+    </LinearLayout>
+</LinearLayout>

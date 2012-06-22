@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.lge.generaltest"
+      android:versionCode="1"
+      android:versionName="1.0">    
+	<permission
+          android:name="com.lge.music.Setting.WRITE"
+          android:permissionGroup="android.permission-group.SYSTEM_TOOLS"
+          android:protectionLevel="normal"
+          android:label="@string/empty"
+          android:description="@string/empty"/>
+ 
+    <uses-permission android:name="com.lge.music.Setting.WRITE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    
+    <uses-sdk android:minSdkVersion="14" />
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+        <activity android:name=".Main_Act" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ActionBar_Act" />
+        <activity android:name=".ActivityLifeCycle_Act"/>
+        <activity android:name=".AlertDlg_Act" />
+        <activity android:name=".Audio_Act"/>
+        <activity android:name=".BitmapLeak_Act" />
+        <activity android:name=".CallStack_Act" />
+        <activity android:name=".CursorLeak_Act" />
+        <activity android:name=".CurrentTime_Act" /> 
+        <activity android:name=".CustomView_Act" />        
+        <activity android:name=".EditText_Act" />
+        <activity android:name=".Etc_Act" />
+        <activity android:name=".FileManager_Act"/>        
+        <activity android:name=".Flex_Act"/>
+        <activity android:name=".FormList_Act"/>
+        <activity android:name=".HeapLeak_Act" />
+        <activity android:name=".Immersive_Act" android:immersive="true" />            
+        <activity android:name=".LayoutAnimation_Act" />
+        <activity android:name=".Memory_Act" />
+        <activity android:name=".MovableList_Act" />
+        <activity android:name=".MusicDB_Act" />
+        <activity android:name=".Progressbar_Act"/>
+        <activity android:name=".ResourceExam_Act"/>
+        <activity android:name=".Roller_Act"/>
+        <activity android:name=".ScrollableButton_Act" />
+        <activity android:name=".Service_Act" />
+        <activity android:name=".SignalClusterView_Act" />
+        <activity android:name=".StatusBar_Act" />
+        <activity android:name=".StatusBarCall_Act" />
+        <activity android:name=".WakeupAlarm_Act" />
+        <activity android:name=".WebView_Act" />       
+        <service android:name=".TickService_Svc" />
+        <service android:name=".ReceiverLeakTest_Svc" />
+        <receiver android:name=".TimeTick_Rcv">
+             <intent-filter>
+                 <action android:name="android.intent.action.TIME_TICK" />
+             </intent-filter>
+        </receiver>         
+        <activity android:name=".Share_Act" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />                
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />                
+            </intent-filter>            
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>            
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>            
+            </activity>
+    </application>
+ </manifest> 
