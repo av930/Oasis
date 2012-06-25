@@ -14,30 +14,30 @@ public class CustomView_Act extends Activity {
         final CustomView view = (CustomView)findViewById(R.id.customview);
         Button button01 = (Button)findViewById(R.id.button01);
         button01.setText("Angle");
-        button01.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {	
-				view.mAngle += 10;
-				view.invalidate();
-			}
-		});
+        button01.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                view.mAngle += 10;
+                view.invalidate();
+            }
+        });
         Button button02 = (Button)findViewById(R.id.button02);
         button02.setText("x");
-        button02.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {	
-				view.mX += 10;
-				view.invalidate();
-			}
-		});
+        button02.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                view.mX += 10;
+                view.invalidate();
+            }
+        });
         Button button03 = (Button)findViewById(R.id.button03);
         button03.setText("y");
-        button03.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {	
-				view.mY += 10;
-				view.invalidate();
-			}
-		});
-   }
+        button03.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                view.mY += 10;
+                view.invalidate();
+            }
+        });
+    }
 }

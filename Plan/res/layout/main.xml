@@ -1,26 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:panel="http://schemas.android.com/apk/res/com.dream.plan"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     <com.dream.plan.PlanView
         android:id="@+id/planview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:padding="10dp"
+        android:padding="30dp"
         android:background="#FFFFFFFF"
         android:clickable="true"    
         android:scrollbars="vertical|horizontal"        
         android:scrollbarStyle="outsideOverlay"/>
-    <LinearLayout
-	    android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
-    	android:orientation="vertical"
-    	android:gravity="right" >
-    <Button
-		android:id="@+id/addbutton"
-	    android:layout_width="wrap_content" 
-	    android:layout_height="wrap_content" 	    
-	    android:text="@string/plus"/>
-    
-    </LinearLayout>
+		<org.panel.Panel
+		    android:layout_width="fill_parent" 
+		    android:layout_height="wrap_content" 
+		    android:id="@+id/topPanel" 
+		    android:paddingBottom="20dip"
+		    panel:position="top"
+		    panel:animationDuration="1000"
+		    panel:linearFlying="true"
+		    panel:openedHandle="@drawable/top_switcher_expanded_background"
+		    panel:closedHandle="@drawable/top_switcher_collapsed_background"
+		>
+			<Button
+				android:id="@id/panelHandle" 
+			    android:layout_width="fill_parent" 
+			    android:layout_height="33dip" 
+			/>
+			<LinearLayout
+				android:id="@id/panelContent" 
+			    android:orientation="vertical"
+	    		android:layout_width="fill_parent"
+	    		android:layout_height="wrap_content"
+			>
+				<CheckBox
+				    android:layout_width="fill_parent" 
+				    android:layout_height="60dip" 
+				    android:gravity="center"
+				    android:background="#688"
+				/>
+				<TextView
+				    android:layout_width="fill_parent" 
+				    android:layout_height="wrap_content" 
+				    android:gravity="center"
+				    android:textSize="16dip"
+				    android:padding="4dip"
+				    android:textColor="#eee"
+				    android:textStyle="bold"
+				    android:background="#323299"
+				/>
+			</LinearLayout>
+		</org.panel.Panel>
 </FrameLayout>

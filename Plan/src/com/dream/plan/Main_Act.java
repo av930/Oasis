@@ -14,23 +14,47 @@ package com.dream.plan;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
 
 public class Main_Act extends Activity {
     PlanView	mPlanView;
-    Button 		mAddButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mPlanView 	= (PlanView)findViewById(R.id.planview);
-        mAddButton	= (Button)findViewById(R.id.addbutton);
-        mAddButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mPlanView.addDefaultPlan();
-            }
-        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String text = null;
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            text = "Application icon";
+            break;
+        case R.id.add:
+            text = "add";
+            mPlanView.addDefaultPlan();
+            break;
+        case R.id.edit:
+            text = "edit";
+            break;
+        case R.id.delete:
+            text = "delete";
+            break;
+        default:
+            return false;
+        }
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+        return true;
     }
 }

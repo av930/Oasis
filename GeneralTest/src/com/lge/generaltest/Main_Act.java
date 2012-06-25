@@ -41,6 +41,7 @@ public class Main_Act extends ListActivity {
         "Heap Leak",
         "Immersive",
         "LayoutAnimation",
+        "ListView - BG color",
         "Memory",
         "MovableList",
         "MusicDB",
@@ -121,6 +122,9 @@ public class Main_Act extends ListActivity {
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, LayoutAnimation_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, ListViewBG_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, Memory_Act.class);

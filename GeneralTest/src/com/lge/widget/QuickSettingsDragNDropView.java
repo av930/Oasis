@@ -50,7 +50,7 @@ public class QuickSettingsDragNDropView extends ListView {
     private int mScrollState = OnScrollListener.SCROLL_STATE_IDLE;
     private Handler mScrollHander = new Handler();
     private ScrollRunnable mScrollRunnable;
-    
+
     private int mDiff = 0;
 
     class ScrollRunnable implements Runnable {
@@ -122,7 +122,7 @@ public class QuickSettingsDragNDropView extends ListView {
 
                 Rect r = mTempRect;
                 dragger.getDrawingRect(r);
-                
+
                 mDiff = (r.bottom + r.top)/2 - mDragPoint;
 
                 //CAPP_RTL

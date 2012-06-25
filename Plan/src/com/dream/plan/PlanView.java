@@ -31,6 +31,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EdgeEffect;
 import android.widget.OverScroller;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.Timer;
@@ -445,7 +446,27 @@ public class PlanView extends View implements OnGestureListener {
     }
 
     public void onLongPress(MotionEvent e) {
-        //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"onLongPress()");
+        float originX = e.getX();
+        float originY = e.getY();
+        float x = originX - mRadius * mScale + mScroller.getCurrX() - getPaddingLeft();
+        float y = originY - mRadius * mScale + mScroller.getCurrY() - getPaddingTop();
+        if ( Math.pow((x), 2) + Math.pow((y), 2) <  Math.pow(mRadius * mScale, 2) ) {
+            double angle = getAngle(x, y);
+            int size = mPlan.size();
+            mActiveArcIndex = ACTIVE_NONE;
+            mStatus = STATUS_NO_ACTIVE;
+            for (int i=0;i<size;i++) {
+                Entry entry = mPlan.get(i);
+                int time = (int)(angle * 4);
+                if ( entry.isInTime(time) ) {
+                    mActiveArcIndex = i;
+                    //mStatus = STATUS_ACTIVE_INDEX;
+                    Toast.makeText(mContext, i+" is selected", Toast.LENGTH_SHORT).show();
+                }
+            }
+            //invalidate();
+        }
+
     }
 
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {

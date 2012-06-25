@@ -23,11 +23,11 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class CustomView extends View {
-	private Context mContext;
-	public int mAngle;
-	public int mX;
-	public int mY;	
-	
+    private Context mContext;
+    public int mAngle;
+    public int mX;
+    public int mY;
+
     public CustomView(Context context) {
         this(context,null,0);
     }
@@ -49,13 +49,13 @@ public class CustomView extends View {
         final int restoreCount = canvas.save();
         //canvas.translate(100, 100);
         canvas.rotate(mAngle, mX, mY);
-        drawable.draw(canvas);      
+        drawable.draw(canvas);
         canvas.restoreToCount(restoreCount);
         Paint paint 	= new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2);
-        paint.setARGB(255, 0, 0, 0);        
-        RectF rect = new RectF(100, 100, 200, 200);        
+        paint.setARGB(255, 0, 0, 0);
+        RectF rect = new RectF(100, 100, 200, 200);
         canvas.drawRect(rect, paint);
     }
 }

@@ -40,6 +40,7 @@
         <activity android:name=".HeapLeak_Act" />
         <activity android:name=".Immersive_Act" android:immersive="true" />            
         <activity android:name=".LayoutAnimation_Act" />
+        <activity android:name=".ListViewBG_Act" />
         <activity android:name=".Memory_Act" />
         <activity android:name=".MovableList_Act" />
         <activity android:name=".MusicDB_Act" />
