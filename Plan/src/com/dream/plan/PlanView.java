@@ -29,7 +29,10 @@ import android.view.GestureDetector;
 import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EdgeEffect;
+import android.widget.EditText;
 import android.widget.OverScroller;
 import android.widget.Toast;
 
@@ -86,6 +89,9 @@ public class PlanView extends View implements OnGestureListener {
     private EdgeEffect				mEdgeGlowLeft;
     private EdgeEffect				mEdgeGlowRight;
 
+    private EditText				mEditText;
+    private InputMethodManager 		mImm = null;
+
     Timer timer = new Timer();
     TimerTask timertask = new TimerTask() {
         public void run() {
@@ -114,7 +120,7 @@ public class PlanView extends View implements OnGestureListener {
         mBG.setLocalMatrix(m);
 
         mFlingHandler = new FlingHandler();
-        mPlan 				= new Plan();
+        mPlan 				= new Plan(context);
 
         mContext 			= context;
 
@@ -136,6 +142,7 @@ public class PlanView extends View implements OnGestureListener {
         mActiveArcPointPaint.setARGB(255, 0, 0, 0);
         mInactiveArcLinePaint.setARGB(255, 128, 128, 128);
         mInactiveArcPointPaint.setARGB(255, 128, 128, 128);
+        mActiveArcPointPaint.setTextSize(40);
 
         mActiveArcIndex 	= ACTIVE_NONE;
         mStatus 			= STATUS_NO_ACTIVE;
@@ -159,6 +166,8 @@ public class PlanView extends View implements OnGestureListener {
         mEdgeGlowRight = new EdgeEffect(mContext);
 
         timer.schedule(timertask, new Date(), 1000);
+
+        mImm = (InputMethodManager)mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @Override
@@ -168,11 +177,11 @@ public class PlanView extends View implements OnGestureListener {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
-        if (width < height) {
-            mRadius 			= (width - getPaddingLeft() - getPaddingRight())/2;
-        } else {
-            mRadius 			= (height - getPaddingTop() - getPaddingBottom())/2;
-        }
+        //if (width < height) {
+        mRadius 			= (width - getPaddingLeft() - getPaddingRight())/2;
+        //} else {
+        //    mRadius 			= (height - getPaddingTop() - getPaddingBottom())/2;
+        //}
 
         calcCoordinate();
         setScrollMinMax();
@@ -247,14 +256,42 @@ public class PlanView extends View implements OnGestureListener {
             Entry entry = mPlan.get(i);
             Paint arcPaint = new Paint();
             arcPaint.setColor(entry.bgcolor);
-            int rcStartAngle = convertTime2Angle(entry.startTime);
+            int rcStartAngle = convertTime2Angle(entry.startTime); 	//RectangularCoordinate
             int rcEndAngle = convertTime2Angle(entry.endTime);
-            int scStartAngle = rcStartAngle - 90;
+            int scStartAngle = rcStartAngle - 90;					//ScreenCoordinate
             if (rcStartAngle < rcEndAngle) {
                 canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle, true, arcPaint);
             } else {
                 canvas.drawArc(mCircleRect, scStartAngle, (float) rcEndAngle - rcStartAngle + 360, true, arcPaint);
             }
+            int x = 0, y = 0;
+            if ( 315 <= rcStartAngle  || rcStartAngle < 45 ) {
+                x = (int) (mCenter.x + mRadius/2 * Math.cos(scStartAngle * Math.PI/2/90));
+                y = (int) (mCenter.y + mRadius/2 * Math.sin(scStartAngle * Math.PI/2/90));
+            } else if (45 <= rcStartAngle && rcStartAngle < 135) {
+                int angle = ( rcStartAngle + rcEndAngle )/2 - 90;
+                x = (int) (mCenter.x + mRadius/4 * Math.cos(angle * Math.PI/2/90));
+                y = (int) (mCenter.y + mRadius/4 * Math.sin(angle * Math.PI/2/90));
+            } else if (135 <= rcStartAngle && rcStartAngle < 225) {
+                int angle = rcEndAngle - 90;
+                x = (int) (mCenter.x + mRadius/2 * Math.cos(angle * Math.PI/2/90));
+                y = (int) (mCenter.y + mRadius/2 * Math.sin(angle * Math.PI/2/90));
+            } else if (225 <= rcStartAngle && rcStartAngle < 315) {
+                int angle = ( rcStartAngle + rcEndAngle )/2 - 90;
+                x = (int) (mCenter.x + mRadius * Math.cos(angle * Math.PI/2/90));
+                y = (int) (mCenter.y + mRadius * Math.sin(angle * Math.PI/2/90));
+            }
+
+            final int restoreCount = canvas.save();
+            int angle = ( rcStartAngle + rcEndAngle + 10 )/2 - 90;
+            x = (int) (mCenter.x + mRadius/4 * Math.cos(angle * Math.PI/2/90));
+            y = (int) (mCenter.y + mRadius/4 * Math.sin(angle * Math.PI/2/90));
+
+            canvas.translate(x, y);
+            canvas.rotate(angle, 0, 0);
+
+            canvas.drawText(entry.title, 0, 0, mActiveArcPointPaint);
+            canvas.restoreToCount(restoreCount);
         }
 
         if ( mActiveArcIndex != ACTIVE_NONE ) {
@@ -466,7 +503,6 @@ public class PlanView extends View implements OnGestureListener {
             }
             //invalidate();
         }
-
     }
 
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
@@ -515,24 +551,73 @@ public class PlanView extends View implements OnGestureListener {
         float originY = e.getY();
         float x = originX - mRadius * mScale + mScroller.getCurrX() - getPaddingLeft();
         float y = originY - mRadius * mScale + mScroller.getCurrY() - getPaddingTop();
+        saveText(false);
         if ( Math.pow((x), 2) + Math.pow((y), 2) <  Math.pow(mRadius * mScale, 2) ) {
             double angle = getAngle(x, y);
             //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"angle="+angle);
             int size = mPlan.size();
-            mActiveArcIndex = ACTIVE_NONE;
-            mStatus = STATUS_NO_ACTIVE;
+
             for (int i=0;i<size;i++) {
                 Entry entry = mPlan.get(i);
                 int time = (int)(angle * 4);
                 if ( entry.isInTime(time) ) {
                     //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," i = "+i);
+                    if (mActiveArcIndex == i) {
+                        if (mEditText.getVisibility() == View.GONE) {
+                            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)mEditText.getLayoutParams();
+                            //lp.leftMargin = (int)originX;
+                            //lp.topMargin = (int)originY;
+                            int rcStartAngle = convertTime2Angle(entry.startTime);
+                            int rcEndAngle = convertTime2Angle(entry.endTime);
+
+                            int angleAve = ( rcStartAngle + rcEndAngle - 10)/2 - 90;
+                            x = (int) (mCenter.x + mRadius*0.80 * Math.cos(angleAve * Math.PI/2/90));
+                            y = (int) (mCenter.y + mRadius*0.80 * Math.sin(angleAve * Math.PI/2/90));
+
+                            lp.leftMargin = (int)x;
+                            lp.topMargin = (int)y;
+
+                            mEditText.setText(entry.title);
+                            mEditText.setLayoutParams(lp);
+                            mEditText.setVisibility(View.VISIBLE);
+                            mImm.showSoftInput(mEditText, 0);
+                        } else {
+                            mImm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+                            mEditText.setVisibility(View.GONE);
+                        }
+                    } else {
+                        mImm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+                        mEditText.setVisibility(View.GONE);
+                    }
                     mActiveArcIndex = i;
                     mStatus = STATUS_ACTIVE_INDEX;
+                    invalidate();
+                    return false;
                 }
             }
-            invalidate();
         }
+//        saveText(true);
+        mImm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+        mEditText.setVisibility(View.GONE);
+
+        mActiveArcIndex = ACTIVE_NONE;
+        mStatus = STATUS_NO_ACTIVE;
+        invalidate();
         return false;
+    }
+
+    private void saveText(boolean hideImm) {
+        if ( mActiveArcIndex != ACTIVE_NONE ) {
+            if ( mEditText.getVisibility() == View.VISIBLE ) {
+                Entry oldEntry = mPlan.get(mActiveArcIndex);
+                oldEntry.title = mEditText.getText().toString();
+                mEditText.setText("");
+                if (hideImm) {
+                    mImm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+                    mEditText.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     public void addDefaultPlan() {
@@ -540,6 +625,18 @@ public class PlanView extends View implements OnGestureListener {
         invalidate();
     }
 
+    public void registerEditText(EditText et) {
+        mEditText = et;
+    }
+
+    public void restore() {
+        mPlan.restore();
+    }
+	
+    public void save() {
+        mPlan.save();
+    }
+	
     private void calcCoordinate() {
         //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG,"calcCoordinate()");
         mCircleRect 		= new ExRectF(0, 0, 2 * mRadius , 2 * mRadius );

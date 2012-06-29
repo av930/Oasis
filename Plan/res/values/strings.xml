@@ -5,5 +5,5 @@
     <string name="app_name">Plan</string>
 	<string name="plus">+</string>
 	<string name="empty">empty</string>
-	
+	<string name="editHint">To do</string>
 </resources>

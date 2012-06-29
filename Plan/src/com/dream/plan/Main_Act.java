@@ -16,16 +16,28 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class Main_Act extends Activity {
     PlanView	mPlanView;
+    EditText	mEditText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        mEditText 	= (EditText)findViewById(R.id.editText);
         mPlanView 	= (PlanView)findViewById(R.id.planview);
+        mPlanView.registerEditText(mEditText);
+        mPlanView.restore();
+    }
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        mPlanView.save();
     }
 
     @Override
