@@ -27,6 +27,7 @@ public class Main_Act extends ListActivity {
         "Action Bar",
         "Activity Life Cycle",
         "Alert Dialog",
+        "Ascii",
         "Audio",
         "Access Other Application's Resource",
         "Bitmap Leak",
@@ -80,6 +81,9 @@ public class Main_Act extends ListActivity {
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, AlertDlg_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, Ascii_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, Audio_Act.class);

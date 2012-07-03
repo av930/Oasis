@@ -26,6 +26,7 @@
         <activity android:name=".ActionBar_Act" />
         <activity android:name=".ActivityLifeCycle_Act"/>
         <activity android:name=".AlertDlg_Act" />
+        <activity android:name=".Ascii_Act" />        
         <activity android:name=".Audio_Act"/>
         <activity android:name=".BitmapLeak_Act" />
         <activity android:name=".CallStack_Act" />
