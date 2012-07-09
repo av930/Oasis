@@ -18,12 +18,9 @@
 */
 -->
 <resources >
-
-
     <style name="CalendarActionBarStyle" >
 		<item name="android:displayOptions">showCustom</item>
     </style>
-
     <style name="EventContent">
         <item name="android:textSize">14dp</item>
     </style>
@@ -32,4 +29,7 @@
         <item name="android:textColor">#FFFF</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="Theme.Wallpaper" parent="android:style/Theme.Wallpaper">
+        <item name="android:colorForeground">#fff</item>
+    </style>    
 </resources>

@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 
 public class Plan {
+
     public class Entry {
         public int 		startTime;
         public int 		endTime;
@@ -57,14 +58,21 @@ public class Plan {
             return "startTime = " + startTime + ", endTime = "+endTime+", title ="+title;
         }
     }
-    private final int 	OBJECT_NUMBER			= 7;
-    private int[] 		mArrBlockColor;
+    
+    private final String 	SHARED_PREFS_NAME 	= "plan";
+    private final String 	PLAN_VERSION_STRING = "version";
+    private final String 	PLAN_LIST_STRING 	= "list";
+    private final int 		PLAN_VERSION_NONE 	= 0;
+    private final int 		PLAN_VERSION 		= 1;
 
-    public Random 					mRnd 			= new Random();
-    private final ArrayList<Entry> 	mEntries = new ArrayList<Entry>();
+    private final int 		OBJECT_NUMBER		= 7;
+    private int[] 			mArrBlockColor;
+
+    public Random 					mRnd 		= new Random();
+    private final ArrayList<Entry> 	mEntries 	= new ArrayList<Entry>();
     private Context 				mContext;
 
-    private final Comparator<Entry> mEntryCmp = new Comparator<Entry>() {
+    private final Comparator<Entry> mEntryCmp 	= new Comparator<Entry>() {
         public int compare(Entry a, Entry b) {
             final int na = a.startTime;
             final int nb = b.startTime;
@@ -118,11 +126,6 @@ public class Plan {
     public Entry get(int i) {
         return mEntries.get(i);
     }
-    private final String SHARED_PREFS_NAME = "plan";
-    private final String PLAN_VERSION_STRING = "version";
-    private final String PLAN_LIST_STRING = "list";
-    private final int PLAN_VERSION_NONE = 0;
-    private final int PLAN_VERSION = 1;
 
     public void save() {
         String data = "";
@@ -133,7 +136,11 @@ public class Plan {
             String items = "";
             items += entry.startTime 	+ ":";
             items += entry.endTime 		+ ":";
-            items += entry.title 		+ ":";
+            if(entry.title.equals("")) {
+            	items += "@" 			+ ":";
+            } else {
+            	items += entry.title 	+ ":";
+            }
             items += entry.bgcolor 		+ "";
             items += "|";
             data += items;
@@ -177,6 +184,9 @@ public class Plan {
         int startTime = Integer.parseInt(tokenizer.nextToken());
         int endTime = Integer.parseInt(tokenizer.nextToken());
         String title = tokenizer.nextToken();
+        if(title.equals("@")) {
+        	title = "";
+        }
         int bgcolor = Integer.parseInt(tokenizer.nextToken());
 
         Entry entry = new Entry(startTime, endTime, title, bgcolor);

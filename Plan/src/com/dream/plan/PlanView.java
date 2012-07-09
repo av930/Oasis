@@ -177,11 +177,11 @@ public class PlanView extends View implements OnGestureListener {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
 
-        //if (width < height) {
-        mRadius 			= (width - getPaddingLeft() - getPaddingRight())/2;
-        //} else {
-        //    mRadius 			= (height - getPaddingTop() - getPaddingBottom())/2;
-        //}
+        if (width < height) {
+        	mRadius 			= (width - getPaddingLeft() - getPaddingRight())/2;
+        } else {
+            mRadius 			= (height - getPaddingTop() - getPaddingBottom())/2;
+        }
 
         calcCoordinate();
         setScrollMinMax();
@@ -189,6 +189,8 @@ public class PlanView extends View implements OnGestureListener {
         mEdgeGlowBottom.setSize(width, height);
         mEdgeGlowLeft.setSize(height, width);
         mEdgeGlowRight.setSize(height, width);
+    	coordinateEdit();
+
     }
 
     @Override
@@ -564,21 +566,8 @@ public class PlanView extends View implements OnGestureListener {
                     //@if ( AppConfig.LOGD ) Log.d(AppConfig.TAG," i = "+i);
                     if (mActiveArcIndex == i) {
                         if (mEditText.getVisibility() == View.GONE) {
-                            ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)mEditText.getLayoutParams();
-                            //lp.leftMargin = (int)originX;
-                            //lp.topMargin = (int)originY;
-                            int rcStartAngle = convertTime2Angle(entry.startTime);
-                            int rcEndAngle = convertTime2Angle(entry.endTime);
-
-                            int angleAve = ( rcStartAngle + rcEndAngle - 10)/2 - 90;
-                            x = (int) (mCenter.x + mRadius*0.80 * Math.cos(angleAve * Math.PI/2/90));
-                            y = (int) (mCenter.y + mRadius*0.80 * Math.sin(angleAve * Math.PI/2/90));
-
-                            lp.leftMargin = (int)x;
-                            lp.topMargin = (int)y;
-
+                        	coordinateEdit();
                             mEditText.setText(entry.title);
-                            mEditText.setLayoutParams(lp);
                             mEditText.setVisibility(View.VISIBLE);
                             mImm.showSoftInput(mEditText, 0);
                         } else {
@@ -604,6 +593,27 @@ public class PlanView extends View implements OnGestureListener {
         mStatus = STATUS_NO_ACTIVE;
         invalidate();
         return false;
+    }
+    
+    private void coordinateEdit() {
+    	if(mActiveArcIndex != ACTIVE_NONE && STATUS_ACTIVE_INDEX == mStatus) {
+	        Entry entry = mPlan.get(mActiveArcIndex);
+	
+	        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)mEditText.getLayoutParams();
+	        //lp.leftMargin = (int)originX;
+	        //lp.topMargin = (int)originY;
+	        int rcStartAngle = convertTime2Angle(entry.startTime);
+	        int rcEndAngle = convertTime2Angle(entry.endTime);
+	
+	        int angleAve = ( rcStartAngle + rcEndAngle - 10)/2 - 90;
+	        int x = (int) (mCenter.x + mRadius*0.80 * Math.cos(angleAve * Math.PI/2/90));
+	        int y = (int) (mCenter.y + mRadius*0.80 * Math.sin(angleAve * Math.PI/2/90));
+	
+	        lp.leftMargin = (int)x;
+	        lp.topMargin = (int)y;
+	
+	        mEditText.setLayoutParams(lp);
+    	}
     }
 
     private void saveText(boolean hideImm) {

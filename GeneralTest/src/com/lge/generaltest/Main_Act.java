@@ -53,7 +53,11 @@ public class Main_Act extends ListActivity {
         "SignalClustorView",
         "StatusBar - General",
         "StatusBar - Call",
+        "Template",
+        "ViewFlipper",
+        "ViewPager",
         "Wakeup Alarm",
+        "Wallpaper1",
         "WebView",
     };
 
@@ -161,7 +165,19 @@ public class Main_Act extends ListActivity {
             Intent intent = new Intent(Main_Act.this, StatusBarCall_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, Template_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, ViewFlipper_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, ViewPager_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, WakeupAlarm_Act.class);
+            startActivity(intent);
+        } else if (strItem.equals(mstrList[nIndex++])) {
+            Intent intent = new Intent(Main_Act.this, Wallpaper1_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, WebView_Act.class);

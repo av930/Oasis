@@ -19,15 +19,15 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 public class Ascii_Act extends ListActivity {
-	private String []mstr = new String[0xFFFF];
+    private String []mstr = new String[0xFFFF];
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppConfig.init(getBaseContext());
         ArrayList<String> alList = new ArrayList<String>();
         for (int i=0xac00;i<0xFFFF;i++) {
-        	mstr[i] = new String();
-        	mstr[i] = String.format("0x%x   %c", i, i);
+            mstr[i] = new String();
+            mstr[i] = String.format("0x%x   %c", i, i);
             alList.add(mstr[i]);
         }
         this.setListAdapter(new ArrayAdapter<String>(this,
