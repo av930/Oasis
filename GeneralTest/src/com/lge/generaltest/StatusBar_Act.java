@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -16,12 +17,14 @@ import android.widget.RemoteViews;
 public class StatusBar_Act extends Activity {
     private NotificationManager mNotificationManager;
     private int mCount = 0;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statusbar_layout);
         Button button;
+        mContext = getBaseContext();
 
         // Get the notification manager serivce.
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -362,6 +365,12 @@ public class StatusBar_Act extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 mNotificationManager.cancel(100);
+            	
+                //Notification notification = new Notification(R.drawable.stat_happy, "This is test", System.currentTimeMillis());                
+                //notification.setLatestEventInfo(mContext, "title", "test", PendingIntent.getActivity(mContext, 0,
+                //                new Intent(mContext, NotificationDisplay.class),
+                //                PendingIntent.FLAG_UPDATE_CURRENT));
+                //mNotificationManager.notify(100, notification);   
             }
         });
         button = (Button) findViewById(R.id.clear);

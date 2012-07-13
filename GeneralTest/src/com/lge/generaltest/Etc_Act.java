@@ -100,6 +100,7 @@ public class Etc_Act extends Activity {
 
             }
         });
+        
         LinearLayout linearLayout = (LinearLayout)findViewById(R.id.etc_linearlayout);
         if (true) {
             BubbleTextView btv = new BubbleTextView(getBaseContext());
