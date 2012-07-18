@@ -58,7 +58,6 @@ public class StatusBarCall_Act extends Activity {
         btnStart.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                // TODO Auto-generated method stub
                 chronometerBaseTime2 = SystemClock.elapsedRealtime();
                 textCallStatus.setText("Call Status : True");
             }
@@ -76,28 +75,22 @@ public class StatusBarCall_Act extends Activity {
 
     @Override
     protected void onPause() {
-        // TODO Auto-generated method stub
         super.onPause();
-
         mNotificationMgr.notify("CALLING", IN_CALL_NOTIFICATION, getCallingNotification());
     }
 
     @Override
     protected void onResume() {
-        // TODO Auto-generated method stub
         super.onResume();
         mNotificationMgr.cancel("CALLING", IN_CALL_NOTIFICATION);
-
     }
 
     @Override
     protected void onDestroy() {
-        // TODO Auto-generated method stub
         super.onDestroy();
         mNotificationMgr.cancel("CALLING", IN_CALL_NOTIFICATION);
         unregisterReceiver(mReceiver);
     }
-
 
     // 종료했을 시 다시 앱으로 돌아오는 인텐트 반환
     private Intent getReturnToCallActivity() {
@@ -107,9 +100,7 @@ public class StatusBarCall_Act extends Activity {
         return notificationIntent;
     }
 
-
     private Notification getCallingNotification() {
-
         // 노티피케이션 생성하기
         Notification notification = new Notification();
         notification.icon = mInCallResId;

@@ -27,9 +27,8 @@ public class Immersive_Act extends Activity {
                 // Get the notification manager serivce.
                 mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
-                RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_custom);
-//            	contentView.setImageViewResource(R.id.button01, R.drawable.btn_bt);
-                contentView.setTextViewText(R.id.text, "KIHOON.KIM");
+                RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_call);
+//            	contentView.setImageViewResource(R.id.button01, R.drawable.btn_bt);                
                 // Set the icon, scrolling text and timestamp
                 Notification notification = new Notification(R.drawable.stat_sad,"This is Test!!!", System.currentTimeMillis());
                 notification.contentView = contentView;
@@ -40,7 +39,7 @@ public class Immersive_Act extends Activity {
 
                 // Send the notification.
                 // We use a layout id because it is a unique number.  We use it later to cancel.
-                mNotificationManager.notify(R.layout.status_bar_custom, notification);
+                mNotificationManager.notify(R.layout.status_bar_call, notification);
             }
         });
     }

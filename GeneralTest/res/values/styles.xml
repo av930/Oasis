@@ -31,5 +31,5 @@
     </style>
     <style name="Theme.Wallpaper" parent="android:style/Theme.Wallpaper">
         <item name="android:colorForeground">#fff</item>
-    </style>    
+    </style>
 </resources>

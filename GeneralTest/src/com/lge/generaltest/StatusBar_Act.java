@@ -2,52 +2,48 @@ package com.lge.generaltest;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.Notification.Builder;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RemoteViews;
 
-/**
- * Demonstrates adding notifications to the status bar
- */
 public class StatusBar_Act extends Activity {
     private NotificationManager mNotificationManager;
     private int mCount = 0;
-    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.statusbar_layout);
         Button button;
-        mContext = getBaseContext();
 
-        // Get the notification manager serivce.
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         // Icon Only
         button = (Button) findViewById(R.id.happy);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, R.layout.statusbar_layout);
+                makeNotification(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, R.layout.statusbar_layout, false, 0, 0);
             }
         });
 
         button = (Button) findViewById(R.id.neutral);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, R.layout.statusbar_layout);
+                makeNotification(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, R.layout.statusbar_layout, false, 0, 0);
             }
         });
 
         button = (Button) findViewById(R.id.sad);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout);
+                makeNotification(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout, false, 0, 0);
             }
         });
 
@@ -55,62 +51,62 @@ public class StatusBar_Act extends Activity {
         button = (Button) findViewById(R.id.buttonexam01);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam01, R.string.exam01, layout+1);
+                makeNotification(R.drawable.stat_exam01, R.string.exam01, layout+1, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam02);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam02, R.string.exam02, layout+2);
+                makeNotification(R.drawable.stat_exam02, R.string.exam02, layout+2, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam03);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam03, R.string.exam03, layout+3);
+                makeNotification(R.drawable.stat_exam03, R.string.exam03, layout+3, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam04);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam04, R.string.exam04, layout+4);
+                makeNotification(R.drawable.stat_exam04, R.string.exam04, layout+4, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam05);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam05, R.string.exam05, layout+5);
+                makeNotification(R.drawable.stat_exam05, R.string.exam05, layout+5, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam06);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam06, R.string.exam06, layout+6);
+                makeNotification(R.drawable.stat_exam06, R.string.exam06, layout+6, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam07);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam07, R.string.exam07, layout+7);
+                makeNotification(R.drawable.stat_exam07, R.string.exam07, layout+7, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam08);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam08, R.string.exam08, layout+8);
+                makeNotification(R.drawable.stat_exam08, R.string.exam08, layout+8, false, 0, 0);
             }
         });
         button = (Button) findViewById(R.id.buttonexam09);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam09, R.string.exam09, layout+9);
+                makeNotification(R.drawable.stat_exam09, R.string.exam09, layout+9, false, 0, 0);
             }
         });
 
         button = (Button) findViewById(R.id.buttonexam10);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconOnly(R.drawable.stat_exam10, R.string.exam10, layout+10);
+                makeNotification(R.drawable.stat_exam10, R.string.exam10, layout+10, false, 0, 0);
             }
         });
 
@@ -118,21 +114,21 @@ public class StatusBar_Act extends Activity {
         button = (Button) findViewById(R.id.happyMarquee);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconMarquee(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, R.layout.statusbar_layout);
+            	makeNotification(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, R.layout.statusbar_layout, true, 0, 0);
             }
         });
 
         button = (Button) findViewById(R.id.neutralMarquee);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconMarquee(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, R.layout.statusbar_layout);
+            	makeNotification(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, R.layout.statusbar_layout, true, 0, 0);
             }
         });
 
         button = (Button) findViewById(R.id.sadMarquee);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setIconMarquee(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout);
+            	makeNotification(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout, true, 0, 0);
             }
         });
 
@@ -161,24 +157,23 @@ public class StatusBar_Act extends Activity {
         button = (Button) findViewById(R.id.defaultSound);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setDefault(Notification.DEFAULT_SOUND);
+                makeNotification(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout, true, 0, Notification.DEFAULT_SOUND);
             }
         });
 
         button = (Button) findViewById(R.id.defaultVibrate);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setDefault(Notification.DEFAULT_VIBRATE);
+                makeNotification(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout, true, 0, Notification.DEFAULT_VIBRATE);
             }
         });
 
         button = (Button) findViewById(R.id.defaultAll);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setDefault(Notification.DEFAULT_ALL);
+                makeNotification(R.drawable.stat_sad, R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout, true, 0, Notification.DEFAULT_ALL);
             }
         });
-
 
         button = (Button) findViewById(R.id.button01);
         button.setText("1");
@@ -195,20 +190,16 @@ public class StatusBar_Act extends Activity {
         button.setText("increase");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_custom);
+                RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_call);
 //            	contentView.setImageViewResource(R.id.button01, R.drawable.btn_bt);
                 mCount++;
-                contentView.setTextViewText(R.id.text, "KIHOON.KIM"+mCount);
-                // Set the icon, scrolling text and timestamp
+                contentView.setTextViewText(R.id.info, "KIHOON.KIM"+mCount);
                 Notification notification = new Notification(R.drawable.stat_sys_gps_acquiring_anim,"DDD", System.currentTimeMillis());
                 notification.contentView = contentView;
                 Intent notificationIntent = new Intent(StatusBar_Act.this, NotificationDisplay.class);
                 PendingIntent contentIntent = PendingIntent.getActivity(StatusBar_Act.this, 0, notificationIntent,0);
                 notification.contentIntent = contentIntent;
-
-                // Send the notification.
-                // We use a layout id because it is a unique number.  We use it later to cancel.
-                mNotificationManager.notify(R.layout.status_bar_custom, notification);
+                mNotificationManager.notify(R.layout.status_bar_call, notification);
             }
         });
 
@@ -216,55 +207,41 @@ public class StatusBar_Act extends Activity {
         button.setText("9");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setMood(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, false, R.layout.statusbar_layout+1, 9);
+                makeNotification(R.drawable.stat_happy, R.string.status_bar_notifications_happy_message, R.layout.statusbar_layout+1, false, 9, 0);
             }
         });
         button = (Button) findViewById(R.id.button04);
         button.setText("22");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setMood(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, false, R.layout.statusbar_layout+2, 22);
+                makeNotification(R.drawable.stat_neutral, R.string.status_bar_notifications_ok_message, R.layout.statusbar_layout+2, false, 22, 0);
             }
         });
         button = (Button) findViewById(R.id.button05);
         button.setText("200");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setMood(R.drawable.stat_sad , R.string.status_bar_notifications_sad_message, false, R.layout.statusbar_layout+3, 200);
+                makeNotification(R.drawable.stat_sad , R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout+3, false, 200, 0);
             }
         });
         button = (Button) findViewById(R.id.button06);
         button.setText("1020");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                setMood(R.drawable.stat_sad , R.string.status_bar_notifications_sad_message, false, R.layout.statusbar_layout+4, 1020);
+                makeNotification(R.drawable.stat_sad , R.string.status_bar_notifications_sad_message, R.layout.statusbar_layout+4, false, 1020, 0);
             }
         });
-
         button = (Button) findViewById(R.id.button07);
         button.setText("long");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 CharSequence text = "This is kihoon";
-
-                // choose the ticker text
                 String tickerText = "Ticker Text";
-
-                // Set the icon, scrolling text and timestamp
-                Notification notification = new Notification(R.drawable.stat_sad, tickerText,
-                        System.currentTimeMillis());
-
-                // Set the info for the views that show in the notification panel.
+                Notification notification = new Notification(R.drawable.stat_sad, tickerText, System.currentTimeMillis());
                 notification.setLatestEventInfo(StatusBar_Act.this, getText(R.string.status_bar_notifications_mood_title),
-                                                "this is test [2012-02-23 10:37:59 - GeneralTest] Performing com.lge.generaltest.Main_Act activity launch[2012-02-23 10:37:59 - GeneralTest] Automatic Target Mode: using device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Uploading GeneralTest.apk onto device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Installing GeneralTest.apk...[2012-02-23 10:38:01 - GeneralTest] Success!", makeMoodIntent(0));
-
+                                                "this is test [2012-02-23 10:37:59 - GeneralTest] Performing com.lge.generaltest.Main_Act activity launch[2012-02-23 10:37:59 - GeneralTest] Automatic Target Mode: using device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Uploading GeneralTest.apk onto device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Installing GeneralTest.apk...[2012-02-23 10:38:01 - GeneralTest] Success!", makePendingIntent(0));
                 notification.flags |= Notification.FLAG_ONGOING_EVENT;
-
-                // Send the notification.
-                // We use a layout id because it is a unique number.  We use it later to cancel.
                 mNotificationManager.notify(100, notification);
-
-
             }
         });
         button = (Button) findViewById(R.id.button08);
@@ -272,25 +249,11 @@ public class StatusBar_Act extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 CharSequence text = "This is kihoon";
-
-                // choose the ticker text
                 String tickerText = "Ticker Text";
-
-                // Set the icon, scrolling text and timestamp
-                Notification notification = new Notification(0, tickerText,
-                        System.currentTimeMillis());
-
-                // Set the info for the views that show in the notification panel.
-                notification.setLatestEventInfo(StatusBar_Act.this, getText(R.string.status_bar_notifications_mood_title),
-                                                "this is test", makeMoodIntent(0));
-
+                Notification notification = new Notification(0, tickerText, System.currentTimeMillis());
+                notification.setLatestEventInfo(StatusBar_Act.this, getText(R.string.status_bar_notifications_mood_title), "this is test", makePendingIntent(0));
                 notification.flags |= Notification.FLAG_ONGOING_EVENT;
-
-                // Send the notification.
-                // We use a layout id because it is a unique number.  We use it later to cancel.
                 mNotificationManager.notify(100, notification);
-
-
             }
         });
         button = (Button) findViewById(R.id.button09);
@@ -298,12 +261,9 @@ public class StatusBar_Act extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 String tickerText = "Music";
-
-                Notification notif = new Notification(R.drawable.stat_sad, tickerText,
-                                                      System.currentTimeMillis());
+                Notification notif = new Notification(R.drawable.stat_sad, tickerText, System.currentTimeMillis());
                 CharSequence text = "Music";
                 notif.tickerText = "this is test";
-
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.ongoing_notification);
                 views.setImageViewResource(R.id.icon, R.drawable.stat_notify_musicplayer);
                 views.setTextViewText(R.id.trackname, "Track Name");
@@ -311,7 +271,6 @@ public class StatusBar_Act extends Activity {
                 views.setTextViewText(R.id.trackname2, "Track Name");
                 views.setTextViewText(R.id.info, "info");
                 notif.contentView = views;
-
                 mNotificationManager.notify(R.drawable.stat_notify_musicplayer, notif);
             }
         });
@@ -320,18 +279,14 @@ public class StatusBar_Act extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 String tickerText = "long2";
-
-                Notification notif = new Notification(R.drawable.stat_sad, tickerText,
-                                                      System.currentTimeMillis());
+                Notification notif = new Notification(R.drawable.stat_sad, tickerText, System.currentTimeMillis());
                 CharSequence text = "long2";
                 notif.tickerText = "this is test";
-
                 RemoteViews views = new RemoteViews(getPackageName(), R.layout.ongoing_notification);
                 views.setImageViewResource(R.id.icon, R.drawable.stat_notify_musicplayer);
                 views.setTextViewText(R.id.trackname, "Track Name");
                 views.setTextViewText(R.id.artistalbum, "Licensed under the Apache License, Version 2.0 (the License) you may not use this file except in compliance with the License.You may obtain a copy of the License at");
                 notif.contentView = views;
-
                 mNotificationManager.notify(R.drawable.stat_sad, notif);
             }
         });
@@ -340,32 +295,19 @@ public class StatusBar_Act extends Activity {
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 CharSequence text = "This is kihoon";
-
-                // choose the ticker text
                 String tickerText = "Ticker Text";
-
-                // Set the icon, scrolling text and timestamp
-                Notification notification = new Notification(R.drawable.stat_sad, tickerText,
-                        System.currentTimeMillis());
-
-                // Set the info for the views that show in the notification panel.
+                Notification notification = new Notification(R.drawable.stat_sad, tickerText, System.currentTimeMillis());
                 notification.setLatestEventInfo(StatusBar_Act.this, getText(R.string.status_bar_notifications_mood_title),
-                                                "this is test [2012-02-23 10:37:59 - GeneralTest] Performing com.lge.generaltest.Main_Act activity launch[2012-02-23 10:37:59 - GeneralTest] Automatic Target Mode: using device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Uploading GeneralTest.apk onto device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Installing GeneralTest.apk...[2012-02-23 10:38:01 - GeneralTest] Success!", makeMoodIntent(0));
-
+                                                "this is test [2012-02-23 10:37:59 - GeneralTest] Performing com.lge.generaltest.Main_Act activity launch[2012-02-23 10:37:59 - GeneralTest] Automatic Target Mode: using device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Uploading GeneralTest.apk onto device 'LG-F160L-1ad2bf'[2012-02-23 10:37:59 - GeneralTest] Installing GeneralTest.apk...[2012-02-23 10:38:01 - GeneralTest] Success!", makePendingIntent(0));
                 notification.flags |= 0x400;
-
-                // Send the notification.
-                // We use a layout id because it is a unique number.  We use it later to cancel.
                 mNotificationManager.notify(100, notification);
-
             }
         });
         button = (Button) findViewById(R.id.button12);
         button.setText("voice cancel");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                mNotificationManager.cancel(100);
-            	
+                mNotificationManager.cancel(100);            	
                 //Notification notification = new Notification(R.drawable.stat_happy, "This is test", System.currentTimeMillis());                
                 //notification.setLatestEventInfo(mContext, "title", "test", PendingIntent.getActivity(mContext, 0,
                 //                new Intent(mContext, NotificationDisplay.class),
@@ -373,6 +315,36 @@ public class StatusBar_Act extends Activity {
                 //mNotificationManager.notify(100, notification);   
             }
         });
+        button = (Button) findViewById(R.id.button13);
+        button.setText("big");
+        button.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+            	Notification notification;            	
+            	PendingIntent contentIntent;        		
+        		contentIntent = makePendingIntent(0);
+        		
+        		// 아래 Builder의 setLargeIcon 함수에서 사용할 Bitmap 생성
+        		Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.icon02);
+        		
+        		// Builder 생성
+        		Builder builder = new Notification.Builder(StatusBar_Act.this);		
+        		builder.setContentTitle("ContentTitle");
+        		builder.setContentText("ContentText"); 
+        		builder.setTicker("Jelly Bean Notification");
+        		builder.setSmallIcon(R.drawable.icon01);
+        		builder.setLargeIcon(bm);
+        		builder.setContentIntent(contentIntent);
+        		builder.setNumber(100);
+        		builder.setContentInfo("hello");
+        		builder.setPriority(0); // notification priority(몇 번째 위치에 표시 될 것인지..)
+        		builder.addAction(R.drawable.icon01, "icon1", contentIntent);
+        		builder.addAction(R.drawable.icon02, "icon2", contentIntent);
+        		builder.addAction(R.drawable.icon03, "icon3", contentIntent);        		        		
+        			
+        		notification = builder.build();
+        		mNotificationManager.notify(0, notification);
+            }
+        });        
         button = (Button) findViewById(R.id.clear);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
@@ -381,7 +353,7 @@ public class StatusBar_Act extends Activity {
         });
     }
 
-    private PendingIntent makeMoodIntent(int moodId) {
+    private PendingIntent makePendingIntent(int moodId) {
         // The PendingIntent to launch our activity if the user selects this
         // notification.  Note the use of FLAG_UPDATE_CURRENT so that if there
         // is already an active matching pending intent, we will update its
@@ -393,93 +365,28 @@ public class StatusBar_Act extends Activity {
                                       PendingIntent.FLAG_UPDATE_CURRENT);
         return contentIntent;
     }
-    private void setIconOnly(int moodId, int textId, int layoutID) {
-        setMood(moodId, textId, false, layoutID, 0);
-    }
 
-    private void setIconMarquee(int moodId, int textId, int layoutID) {
-        setMood(moodId, textId, true, layoutID, 0);
-    }
-
-    private void setMood(int moodId, int textId, boolean showTicker, int layoutID, int number) {
-        // In this sample, we'll use the same text for the ticker and the expanded notification
+    private void makeNotification(int moodId, int textId, int layoutID, boolean showTicker, int number, int defaults) {
         CharSequence text = getText(textId);
-
-        // choose the ticker text
         String tickerText = showTicker ? getString(textId) : null;
-
-        // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(moodId, tickerText,
-                System.currentTimeMillis());
-
-        // Set the info for the views that show in the notification panel.
-        notification.setLatestEventInfo(this, getText(R.string.status_bar_notifications_mood_title),
-                                        text, makeMoodIntent(moodId));
-
+        Notification notification = new Notification(moodId, tickerText, System.currentTimeMillis());
+        notification.setLatestEventInfo(this, getText(R.string.status_bar_notifications_mood_title), text, makePendingIntent(moodId));
         notification.number = number;
         notification.flags |= Notification.FLAG_ONGOING_EVENT;
-
-        // Send the notification.
-        // We use a layout id because it is a unique number.  We use it later to cancel.
+        notification.defaults = defaults;
         mNotificationManager.notify(layoutID, notification);
     }
 
     private void setRemoteView(int moodId, int textId) {
-        // Instead of the normal constructor, we're going to use the one with no args and fill
-        // in all of the data ourselves.  The normal one uses the default layout for notifications.
-        // You probably want that in most cases, but if you want to do something custom, you
-        // can set the contentView field to your own RemoteViews object.
         Notification notif = new Notification();
-
-        // This is who should be launched if the user selects our notification.
-        notif.contentIntent = makeMoodIntent(moodId);
-
-        // In this sample, we'll use the same text for the ticker and the expanded notification
+        notif.contentIntent = makePendingIntent(moodId);
         CharSequence text = getText(textId);
         notif.tickerText = text;
-
-        // the icon for the status bar
         notif.icon = moodId;
-
-        // our custom view
-        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_balloon);
-        contentView.setTextViewText(R.id.text, text);
+        RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.status_bar_call);
+        contentView.setTextViewText(R.id.info, text);
         contentView.setImageViewResource(R.id.icon, moodId);
         notif.contentView = contentView;
-
-        // we use a string id because is a unique number.  we use it later to cancel the
-        // notification
         mNotificationManager.notify(R.layout.statusbar_layout, notif);
-    }
-
-    private void setDefault(int defaults) {
-        // This method sets the defaults on the notification before posting it.
-
-        // This is who should be launched if the user selects our notification.
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                                      new Intent(this, StatusBar_Act.class), 0);
-
-        // In this sample, we'll use the same text for the ticker and the expanded notification
-        CharSequence text = getText(R.string.status_bar_notifications_happy_message);
-
-        final Notification notification = new Notification(
-            R.drawable.stat_happy,       // the icon for the status bar
-            text,                        // the text to display in the ticker
-            System.currentTimeMillis()); // the timestamp for the notification
-
-        notification.setLatestEventInfo(
-            this,                        // the context to use
-            getText(R.string.status_bar_notifications_mood_title),
-            // the title for the notification
-            text,                        // the details to display in the notification
-            contentIntent);              // the contentIntent (see above)
-
-        notification.defaults = defaults;
-        //notification.flags = Notification.
-
-        mNotificationManager.notify(
-            R.layout.statusbar_layout, // we use a string id because it is a unique
-            // number.  we use it later to cancel the
-            notification);                     // notification
     }
 }
