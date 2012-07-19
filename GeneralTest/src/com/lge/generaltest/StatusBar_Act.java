@@ -319,7 +319,7 @@ public class StatusBar_Act extends Activity {
         button.setText("big");
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-            	Notification notification;            	
+            	Notification notification = new Notification();
             	PendingIntent contentIntent;        		
         		contentIntent = makePendingIntent(0);
         		
@@ -336,12 +336,13 @@ public class StatusBar_Act extends Activity {
         		builder.setContentIntent(contentIntent);
         		builder.setNumber(100);
         		builder.setContentInfo("hello");
-        		builder.setPriority(0); // notification priority(몇 번째 위치에 표시 될 것인지..)
-        		builder.addAction(R.drawable.icon01, "icon1", contentIntent);
-        		builder.addAction(R.drawable.icon02, "icon2", contentIntent);
-        		builder.addAction(R.drawable.icon03, "icon3", contentIntent);        		        		
-        			
-        		notification = builder.build();
+        		
+        		//&builder.setPriority(0); // notification priority(몇 번째 위치에 표시 될 것인지..)
+        		//&builder.addAction(R.drawable.icon01, "icon1", contentIntent);
+        		//&builder.addAction(R.drawable.icon02, "icon2", contentIntent);
+        		//&builder.addAction(R.drawable.icon03, "icon3", contentIntent);
+        		//&notification = builder.build();
+        		
         		mNotificationManager.notify(0, notification);
             }
         });        

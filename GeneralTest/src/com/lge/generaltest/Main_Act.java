@@ -57,7 +57,7 @@ public class Main_Act extends ListActivity {
         "ViewFlipper",
         "ViewPager",
         "Wakeup Alarm",
-        "Wallpaper1",
+        "Wallpaper",
         "WebView",
     };
 
@@ -177,7 +177,7 @@ public class Main_Act extends ListActivity {
             Intent intent = new Intent(Main_Act.this, WakeupAlarm_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
-            Intent intent = new Intent(Main_Act.this, Wallpaper1_Act.class);
+            Intent intent = new Intent(Main_Act.this, Wallpaper_Act.class);
             startActivity(intent);
         } else if (strItem.equals(mstrList[nIndex++])) {
             Intent intent = new Intent(Main_Act.this, WebView_Act.class);

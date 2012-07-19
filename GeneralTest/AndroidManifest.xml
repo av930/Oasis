@@ -16,7 +16,7 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.SET_WALLPAPER"/>
     
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="16" />
+    <uses-sdk android:minSdkVersion="15" android:targetSdkVersion="15" />
     <application android:icon="@drawable/icon" android:label="@string/app_name">
         <activity android:name=".Main_Act" >
             <intent-filter>
@@ -58,7 +58,7 @@
         <activity android:name=".ViewFlipper_Act" />
         <activity android:name=".ViewPager_Act" />
         <activity android:name=".WakeupAlarm_Act" />
-        <activity android:name=".Wallpaper1_Act" android:theme="@style/Theme.Wallpaper"/>
+        <activity android:name=".Wallpaper_Act" android:theme="@style/Theme.Wallpaper"/>
         <activity android:name=".WebView_Act" />       
         <service android:name=".TickService_Svc" />
         <service android:name=".ReceiverLeakTest_Svc" />

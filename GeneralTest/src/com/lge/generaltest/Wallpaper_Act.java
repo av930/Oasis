@@ -5,29 +5,34 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
-public class Wallpaper1_Act extends Activity {
+public class Wallpaper_Act extends Activity {
+    private WallpaperManager 	mWallpaperManager = null;
     private Button 				mButton01;
     private Button 				mButton02;
-    private Button 				mButton03;
-    private Button 				mButton04;
-    private Button 				mButton05;
+    private int					mOffsetX;
+    private FrameLayout 		mFrame;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.template_layout);
-
-        final WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-
+        setContentView(R.layout.wallpaper_layout);
+        mFrame = (FrameLayout) findViewById(R.id.total);
+        
+        mWallpaperManager = WallpaperManager.getInstance(this);
+        mOffsetX = 0;
+		mWallpaperManager.setWallpaperOffsetSteps((float) 0.1666, 0 );
+		
         mButton01 = (Button) findViewById(R.id.button01);
         mButton01.setText("wallpaper1");
         mButton01.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    wallpaperManager.setResource(R.raw.wallpaper1);
+                	mWallpaperManager.setResource(R.raw.wallpaper1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -39,11 +44,20 @@ public class Wallpaper1_Act extends Activity {
         mButton02.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 try {
-                    wallpaperManager.setResource(R.raw.wallpaper2);
+                	mWallpaperManager.setResource(R.raw.wallpaper2);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         });
     }
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		mOffsetX = (int) event.getX();
+		if( mWallpaperManager != null ) {
+			mWallpaperManager.setWallpaperOffsets(mFrame.getWindowToken(), (float)((float)(720 - mOffsetX)/(float)(520))-(float)0.2, 0 );
+		}
+		return super.onTouchEvent(event);
+	}
 }
