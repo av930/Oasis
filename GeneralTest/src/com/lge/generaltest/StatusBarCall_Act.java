@@ -60,6 +60,7 @@ public class StatusBarCall_Act extends Activity {
             public void onClick(View v) {
                 chronometerBaseTime2 = SystemClock.elapsedRealtime();
                 textCallStatus.setText("Call Status : True");
+                mNotificationMgr.notify("CALLING", IN_CALL_NOTIFICATION, getCallingNotification());
             }
         });
 
@@ -69,20 +70,9 @@ public class StatusBarCall_Act extends Activity {
                 // TODO Auto-generated method stub
                 chronometerBaseTime2 = 0;
                 textCallStatus.setText("Call Status : False");
+                mNotificationMgr.cancel("CALLING", IN_CALL_NOTIFICATION);
             }
         });
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mNotificationMgr.notify("CALLING", IN_CALL_NOTIFICATION, getCallingNotification());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mNotificationMgr.cancel("CALLING", IN_CALL_NOTIFICATION);
     }
 
     @Override

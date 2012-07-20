@@ -8,7 +8,7 @@
     <string name="test02">test02</string>
     <string name="start_service">start_service</string>
     <string name="stop_service">stop_service</string>
-    <string name="menu_endCall">menu_endCall</string>    
+    <string name="end_call">end call</string>    
     <string name="exam00">00</string>
     <string name="exam01">01</string>
     <string name="exam02">02</string>

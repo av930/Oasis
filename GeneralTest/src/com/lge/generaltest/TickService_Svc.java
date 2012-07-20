@@ -17,6 +17,7 @@ public class TickService_Svc extends Service {
             Log.d("kihoon.kim","onReceive() "+intent.getAction());
         }
     };
+        
     @Override
     public void onCreate() {
         IntentFilter filter = new IntentFilter();

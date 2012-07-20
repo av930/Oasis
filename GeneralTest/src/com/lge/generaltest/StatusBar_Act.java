@@ -346,6 +346,25 @@ public class StatusBar_Act extends Activity {
         		mNotificationManager.notify(0, notification);
             }
         });        
+        
+        button = (Button) findViewById(R.id.button14);
+        button.setText("LED");
+        button.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                CharSequence text = "LED";
+                String tickerText = "LED";
+                Notification notification = new Notification(R.drawable.stat_sad, tickerText, System.currentTimeMillis());
+                notification.setLatestEventInfo(StatusBar_Act.this, getText(R.string.status_bar_notifications_mood_title),
+                                                "this is test", makePendingIntent(0));
+                notification.flags |= Notification.FLAG_SHOW_LIGHTS;
+                notification.ledARGB = 0xff00ff00;
+                notification.ledOnMS = 1300;
+                notification.ledOffMS = 1300;
+                mNotificationManager.notify(100, notification);            	
+            }
+        });
+ 
+        
         button = (Button) findViewById(R.id.clear);
         button.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {

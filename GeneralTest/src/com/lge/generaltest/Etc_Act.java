@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.View;
@@ -20,12 +21,16 @@ import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import android.content.ContentResolver;
+
 public class Etc_Act extends Activity {
     private Button 				mButton01;
     private Button 				mButton02;
     private Button 				mButton03;
     private Button 				mButton04;
     private Button 				mButton05;
+    private Button 				mButton06;
+    private Context 			mContext;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,7 @@ public class Etc_Act extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.etc_layout);
+        mContext = getBaseContext();
 
         mButton01 = (Button) findViewById(R.id.button01);
         mButton01.setText("Ringtone Picker");
@@ -100,7 +106,15 @@ public class Etc_Act extends Activity {
 
             }
         });
-        
+        mButton06 = (Button) findViewById(R.id.button06);
+        mButton06.setText("save LED setting");
+        mButton06.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ContentResolver resolver = mContext.getContentResolver();
+                boolean pulseEnabled = Settings.System.putInt(resolver, "notification_light_pulse", 1);
+            }
+        });
+
         LinearLayout linearLayout = (LinearLayout)findViewById(R.id.etc_linearlayout);
         if (true) {
             BubbleTextView btv = new BubbleTextView(getBaseContext());
